@@ -1,13 +1,9 @@
-# Guidance Title (required)
+# Guidance for American Sign Language (ASL) 3D Avatar Translator on AWS
 
 The Guidance title should be consistent with the title established first in Alchemy.
 
-**Example:** *Guidance for Product Substitutions on AWS*
 
-This title correlates exactly to the Guidance it’s linked to, including its corresponding sample code repository. 
-
-
-## Table of Content (required)
+## Table of Content
 
 List the top-level sections of the README template, along with a hyperlink to the specific section.
 
