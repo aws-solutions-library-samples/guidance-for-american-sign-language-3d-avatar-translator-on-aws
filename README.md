@@ -1,9 +1,13 @@
 # Guidance for American Sign Language (ASL) 3D Avatar Translator on AWS
 
-The Guidance title should be consistent with the title established first in Alchemy.
+Currently, this repository consists purely of documentation for a Spatial Computing/GenAI prototype solution that was 
+presented at re:Invent 2023. In the coming months, it will have polished code posted, which includes the following major
+components:
+   - A CDK-deployable project with lambda code
+   - Sample code for a web frontend interface
+   - An Unreal Engine 5.3 C++ project
 
-
-## Table of Content
+## Table of Contents
 
 List the top-level sections of the README template, along with a hyperlink to the specific section.
 
