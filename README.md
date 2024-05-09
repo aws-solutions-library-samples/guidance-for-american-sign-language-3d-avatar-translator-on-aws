@@ -7,14 +7,13 @@ components:
    - Sample code for a web frontend interface
    - An Unreal Engine 5.3 C++ project
 
+Please check back for future updates.
+
 ## Table of Contents
-
-List the top-level sections of the README template, along with a hyperlink to the specific section.
-
-### Required
 
 1. [Overview](#overview-required)
     - [Cost](#cost)
+2. [High-level Workflow](#High-level Workflow)
 2. [Prerequisites](#prerequisites-required)
     - [Operating System](#operating-system-required)
 3. [Deployment Steps](#deployment-steps-required)
@@ -30,16 +29,43 @@ List the top-level sections of the README template, along with a hyperlink to th
 10. [Notices](#notices-optional)
 11. [Authors](#authors-optional)
 
-## Overview (required)
+## Overview
 
-1. Provide a brief overview explaining the what, why, or how of your Guidance. You can answer any one of the following to help you write this:
+This prototype demonstrates a novel way to pre-process/transform multilingual phrases into an equivalent 
+literal (or direct) form for visual translation into American Sign Language (ASL). This pre-processing step improves 
+sign language translation fidelity by expressing phrases more clearly than they were initially expressed. GenAI is 
+applied to re-interpret these multilingual input phrases into 'simpler form' English phrases across multiple 
+iterations/passes. Resulting phases have a different (more charitable) kind of interpretation versus phrases 
+produced by traditional translation tools. Finally, this prototype animates an avatar in Unreal Engine (MetaHuman 
+plug-in) to depict the ASL translation of those resulting phrases. Visual ASL translation in this prototype is based 
+on a loose/naïve interpretation of ASL rules and grammar, involving primarily hand and arm movements, which end users 
+can refine.
 
-    - **Why did you build this Guidance?**
-    - **What problem does this Guidance solve?**
+### Architecture Diagram
 
-2. Include the architecture diagram image, as well as the steps explaining the high-level overview and flow of the architecture. 
-    - To add a screenshot, create an ‘assets/images’ folder in your repository and upload your screenshot to it. Then, using the relative file path, add it to your README. 
+![Alt text](assets/images/architecture.png?raw=true "Architecture")
 
+### Architecture Diagram Workflow
+1. User authenticates to the web application using Amazon Cognito
+2. Logged in user can record his audio voice which will be transcribed using Amazon Transcribe. The output text will
+   be displayed on the page.
+3. The user can can perform multiple actions through the user interface. All the actions listed below will be 
+   triggered through an Amazon API gateway:
+    - ASL translation: the transcribed text is sent to a Lambda function for processing. The text is simplified and 
+      translated to english using Amazon Bedrock. Message is analyzed for toxicity using Amazon Comprehend
+    - Avatar change: a different avatar can be selected for display in the end application
+    - Change background image: the end application background image can be generated using Amazon Bedrock. A 
+      moderation step will be performed on the generated image to detect unsafe content using Amazon Rekognition.
+    - Stop all activities: will stop all the queued activities on the Unreal Engine application side
+    - Change settings: will update settings like the sign rate on the Unreal Engine application side
+4. All messages related to translation are published to an Amazon Simple Notification Service topic. Other messages 
+   from other actions are publish to a second topic.
+5. Messages are then transmitted to two FIFO Amazon Simple Queue Service (SQS) queues
+6. An Unreal Engine application with the Metahuman plugin, running on an Amazon Elastic Cloud Compute (EC2) instance 
+   is subscribed to the SQS queue to consume messages, and process them 
+7. The user can access remotely the Amazon EC2 instance through Remote Desktop Protocol / NiceDCV and visualize the 
+   3D avatar
+   
 ### Cost ( required )
 
 This section is for a high-level cost estimate. Think of a likely straightforward scenario with reasonable assumptions based on the problem the Guidance is trying to solve. If applicable, provide an in-depth cost breakdown table in this section.
@@ -61,6 +87,14 @@ The following table provides a sample cost breakdown for deploying this Guidance
 | ----------- | ------------ | ------------ |
 | Amazon API Gateway | 1,000,000 REST API calls per month  | $ 3.50month |
 | Amazon Cognito | 1,000 active users per month without advanced security feature | $ 0.00 |
+
+### High-level Workflow
+
+1) an end user speaks (or types) a phrase in a spoken language of choice
+2) that spoken phrase is transcribed directly
+3) the transcribed phrase is translated via GenAI into English, which is then simplified across multiple iterations 
+   using carefully-crafted Bedrock prompts
+4) an Avatar in Unreal Engine animates ASL gestures ("signs") corresponding to the simplified transcription
 
 ## Prerequisites (required)
 
@@ -160,14 +194,14 @@ This section should include:
 
 ## Next Steps (required)
 
-Provide suggestions and recommendations about how customers can modify the parameters and the components of the Guidance to further enhance it according to their requirements.
-
+Overall, this prototype illustrates an end-to-end workflow for American Sign Language (ASL) translation through the 
+use of a 3D avatar. Ideally, generated pre-ASL output phrases should be forwarded to a robust ASL processing engine, 
+which would then generate corresponding avatar animation data to be supplied to Unreal Engine.
 
 ## Cleanup (required)
 
 - Include detailed instructions, commands, and console actions to delete the deployed Guidance.
 - If the Guidance requires manual deletion of resources, such as the content of an S3 bucket, please specify.
-
 
 
 ## FAQ, known issues, additional considerations, and limitations (optional)
@@ -200,14 +234,22 @@ Document all notable changes to this project.
 
 Consider formatting this section based on Keep a Changelog, and adhering to Semantic Versioning.
 
-## Notices (optional)
 
-Include a legal disclaimer
+## License
 
-**Example:**
-*Customers are responsible for making their own independent assessment of the information in this Guidance. This Guidance: (a) is for informational purposes only, (b) represents AWS current product offerings and practices, which are subject to change without notice, and (c) does not create any commitments or assurances from AWS and its affiliates, suppliers or licensors. AWS products or services are provided “as is” without warranties, representations, or conditions of any kind, whether express or implied. AWS responsibilities and liabilities to its customers are controlled by AWS agreements, and this Guidance is not part of, nor does it modify, any agreement between AWS and its customers.*
+This library is licensed under the MIT-0 License. See the [LICENSE](LICENSE) file.
 
+## Notices
+Customers are responsible for making their own independent assessment of the information in this document. This 
+document: (a) is for informational purposes only, (b) represents AWS current product offerings and practices, which 
+are subject to change without notice, and (c) does not create any commitments or assurances from AWS and its 
+affiliates, suppliers or licensors. AWS products or services are provided “as is” without warranties, 
+representations, or conditions of any kind, whether express or implied. AWS responsibilities and liabilities to its 
+customers are controlled by AWS agreements, and this document is not part of, nor does it modify, any agreement 
+between AWS and its customers.
 
-## Authors (optional)
+## Authors
 
-Name of code contributors
+David Israel
+Daniel Zilberman
+Alain Krok
