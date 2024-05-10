@@ -3,15 +3,15 @@
 ![Alt text](assets/images/rainbow-example.png?raw=true "Sample Translation")
 <video src="https://github.com/aws-solutions-library-samples/guidance-for-american-sign-language-3d-avatar-translator-on-aws/assets/156058749/a612dfd9-dba3-4ba3-af6d-baf187f13119"></video>
 
-
 Currently, this repository consists purely of documentation for a Spatial Computing/GenAI prototype solution that was 
 presented at Amazon's re:Invent 2023 conference. In the coming months, it will have polished code posted, which 
 includes the following major components:
-   - A CDK-deployable project with lambda code
-   - Sample code for a web frontend interface
-   - An Unreal Engine 5.3 C++ project
+   - A CDK-deployable project (includes lambda code for very basic GenAI-based ASL translation logic and message 
+     passing)
+   - Sample code for a web interface (for users to speak or type phrases to be translated)
+   - An Unreal Engine 5.3 C++ project (displays ASL translations performed by a realistic 3D avatar)
 
-Please check back for future updates.
+Please check this repository for future updates as code becomes available.
 
 ## Table of Contents
 
@@ -35,40 +35,51 @@ Please check back for future updates.
 
 ## Overview
 
-This prototype demonstrates a novel way to pre-process/transform multilingual phrases into an equivalent 
-literal (or direct) form for visual translation into American Sign Language (ASL). This pre-processing step improves 
-sign language translation fidelity by expressing phrases more clearly than they were initially expressed. GenAI is 
-applied to re-interpret these multilingual input phrases into 'simpler form' English phrases across multiple 
-iterations/passes. Resulting phases have a different (more charitable) kind of interpretation versus phrases 
-produced by traditional translation tools. Finally, this prototype animates an avatar in Unreal Engine (MetaHuman 
-plug-in) to depict the ASL translation of those resulting phrases. Visual ASL translation in this prototype is based 
-on a loose/naïve interpretation of ASL rules and grammar, involving primarily hand and arm movements, which end users 
-can refine.
+This prototype demonstrates a novel way to pre-process/transform multilingual phrases into an equivalent literal (or 
+direct) form for translation into American Sign Language (ASL). This pre-processing step improves sign language 
+translation fidelity by expressing user-provided (input) phrases more clearly than they were initially expressed. 
+GenAI is applied to re-interpret these multilingual input phrases into simpler, more explicit English phrases across 
+multiple iterations/passes. These resulting phases have a different (more charitable) kind of interpretation versus 
+the resulting phrases produced by traditional non-GenAI-based translation tools. Finally, this prototype animates a 
+realistic avatar in Unreal Engine (via <a href="https://www.unrealengine.com/en-US/metahuman" 
+target="_blank">MetaHuman plugin</a>) to visually depict the ASL translation of those resulting phrases. ASL
+translation in this prototype is based on a very loose/naïve interpretation of ASL rules and grammar, involving 
+primarily hand and arm movements, all of which end users can refine. The main goals of this project are to essentially
+improve the translation of existing robust ASL translation engines (through the use of GenAI), and to provide an 
+engaging multimodal interface to view ASL translations.
 
 ### Architecture Diagram
 
 ![Alt text](assets/images/architecture.png?raw=true "Architecture")
 
 ### Architecture Diagram Workflow
-1. User authenticates to the web application using Amazon Cognito
-2. Logged in user can record his audio voice which will be transcribed using Amazon Transcribe. The output text will
-   be displayed on the page.
-3. The user can can perform multiple actions through the user interface. All the actions listed below will be 
-   triggered through an Amazon API gateway:
-    - ASL translation: the transcribed text is sent to a Lambda function for processing. The text is simplified and 
-      translated to english using Amazon Bedrock. Message is analyzed for toxicity using Amazon Comprehend
-    - Avatar change: a different avatar can be selected for display in the end application
-    - Change background image: the end application background image can be generated using Amazon Bedrock. A 
-      moderation step will be performed on the generated image to detect unsafe content using Amazon Rekognition.
-    - Stop all activities: will stop all the queued activities on the Unreal Engine application side
-    - Change settings: will update settings like the sign rate on the Unreal Engine application side
-4. All messages related to translation are published to an Amazon Simple Notification Service topic. Other messages 
-   from other actions are publish to a second topic.
-5. Messages are then transmitted to two FIFO Amazon Simple Queue Service (SQS) queues
-6. An Unreal Engine application with the Metahuman plugin, running on an Amazon Elastic Cloud Compute (EC2) instance 
-   is subscribed to the SQS queue to consume messages, and process them 
-7. The user can access remotely the Amazon EC2 instance through Remote Desktop Protocol / NiceDCV and visualize the 
-   3D avatar
+1. User authenticates to the provided sample web interface via Amazon Cognito
+2. User speaks a phrase, which will be transcribed using Amazon Transcribe, or optionally types a phrase. 
+   (Transcribed text will be displayed as it is spoken.)
+3. User requests any of the following actions through the web interface (actions are triggered through Amazon API 
+   Gateway):
+    - Perform ASL Translation
+      - Transcribed phrase text is sent to a Lambda function for processing. This text is then simplified and 
+        translated into English using Amazon Bedrock. During this process, processed text is analyzed 
+        for toxicity using Amazon Comprehend.
+    - Change the Avatar (which is performing ASL translation)
+      - Different avatars can be selected and the selected avatar will then display in the Unreal Engine sample 
+        application
+    - Change the Background Image (representing the meaning of the translated phase):
+      - A background image in Unreal Engine is generated using Amazon Bedrock. Once generated, a moderation check 
+        will be performed on the generated image to detect unsafe content using Amazon Rekognition.
+    - Stop all Active Activities (in Unreal Engine)
+      - This option will suspend all queued activities (listed above) in Unreal Engine
+    - Change Settings
+      - This option can update custom settings (including ASL signing speed) in Unreal Engine
+4. Each message that specifically relates to ASL translation is pushed to an Amazon Simple Notification Service (SNS) 
+   topic. Other message types (from other actions) are publish to another (separate) SNS topic.
+5. SNS messages are then transmitted to two first-in-first-out (FIFO)-based Amazon Simple Queue Service (SQS) queues
+6. The Unreal Engine sample application, which includes the MetaHuman plugin, is running on an Amazon Elastic 
+   Cloud Compute (EC2) instance or on a client-based machine. That application is subscribed to the SQS queue, 
+   periodically polling it to consume messages (when ready) and processes them. 
+7. User can remotely access the Amazon EC2 instance through Remote Desktop Protocol or NiceDCV to visualize the 
+   3D avatar that is performing ASL translation.
    
 ### Cost ( required )
 
@@ -196,11 +207,27 @@ This section should include:
 
 
 
-## Next Steps (required)
+## Next Steps
 
 Overall, this prototype illustrates an end-to-end workflow for American Sign Language (ASL) translation through the 
 use of a 3D avatar. Ideally, generated pre-ASL output phrases should be forwarded to a robust ASL processing engine, 
 which would then generate corresponding avatar animation data to be supplied to Unreal Engine.
+
+Suggested future enhancements:
+
+* LiveLink capability
+  * Mechanism to dynamically feed external animation data into UE to control individual skeleton joints per animation 
+    frame (versus a playing limited selection of pre-built UE animations)
+* Animation Montage with Blending
+  * Make ASL signing animations more natural/less abrupt/smooth, easier to decipher sentences, allow for multiple 
+    animations at once across more parts of the skeleton rig (i.e. face, hands etc).
+* Animations of additional body components (i.e. face)
+* Extend architecture to support other variants of Sign Language
+* Design/re-architect to support ASL translation processing performed outside of UE
+* Integrate lambdas ASL "pre-processor" logic with a robust external ASL engine/API, compare before/after output.
+* Application integration 
+  * Stream ASL animations to major chat programs, batch offline processing of videos 
+* Extend translation capability to other sign-language variants
 
 ## Cleanup (required)
 
