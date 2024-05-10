@@ -1,6 +1,7 @@
 # Guidance for American Sign Language (ASL) 3D Avatar Translator on AWS
 
 ![Alt text](assets/images/rainbow-example.png?raw=true "Sample Translation")
+<video src="assets/videos/translation-example.mp4"></video>
 
 Currently, this repository consists purely of documentation for a Spatial Computing/GenAI prototype solution that was 
 presented at Amazon's re:Invent 2023 conference. In the coming months, it will have polished code posted, which 
