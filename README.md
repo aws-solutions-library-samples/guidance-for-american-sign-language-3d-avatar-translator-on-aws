@@ -17,21 +17,19 @@ Please check this repository for future updates as code becomes available.
 
 1. [Overview](#overview-required)
     - [Cost](#cost)
-2. [High-level Workflow](#High-level Workflow)
-2. [Prerequisites](#prerequisites-required)
+2. [High-level Workflow](#high-level-workflow)
+3. [Reference Architecture](#reference-architecture)
+4. [Prerequisites](#prerequisites-required)
     - [Operating System](#operating-system-required)
-3. [Deployment Steps](#deployment-steps-required)
-4. [Deployment Validation](#deployment-validation-required)
-5. [Running the Guidance](#running-the-guidance-required)
-6. [Next Steps](#next-steps-required)
-7. [Cleanup](#cleanup-required)
-
-***Optional***
-
-8. [FAQ, known issues, additional considerations, and limitations](#faq-known-issues-additional-considerations-and-limitations-optional)
-9. [Revisions](#revisions-optional)
-10. [Notices](#notices-optional)
-11. [Authors](#authors-optional)
+5. [Deployment Steps](#deployment-steps-required)
+6. [Deployment Validation](#deployment-validation-required)
+7. [Running the Guidance](#running-the-guidance-required)
+8. [License](#License)
+9. [Next Steps](#next-steps)
+10. [Cleanup](#cleanup-required)
+11. [FAQ, known issues, additional considerations, and limitations] (#faq-known-issues-additional-considerations-and-limitations-optional)
+12. [Notices](#notices-optional)
+13. [Authors](#authors-optional)
 
 ## Overview
 
@@ -48,7 +46,15 @@ primarily hand and arm movements, all of which end users can refine. The main go
 improve the translation of existing robust ASL translation engines (through the use of GenAI), and to provide an 
 engaging multimodal interface to view ASL translations.
 
-### Architecture Diagram
+## High-level Workflow
+
+1) an end user speaks (or types) a phrase in a spoken language of choice
+2) that spoken phrase is transcribed directly
+3) the transcribed phrase is translated via GenAI into English, which is then simplified across multiple iterations 
+   using carefully-crafted Bedrock prompts
+4) an Avatar in Unreal Engine animates ASL gestures ("signs") corresponding to the simplified transcription
+
+## Reference Architecture
 
 ![Alt text](assets/images/architecture.png?raw=true "Architecture")
 
@@ -102,14 +108,6 @@ The following table provides a sample cost breakdown for deploying this Guidance
 | ----------- | ------------ | ------------ |
 | Amazon API Gateway | 1,000,000 REST API calls per month  | $ 3.50month |
 | Amazon Cognito | 1,000 active users per month without advanced security feature | $ 0.00 |
-
-### High-level Workflow
-
-1) an end user speaks (or types) a phrase in a spoken language of choice
-2) that spoken phrase is transcribed directly
-3) the transcribed phrase is translated via GenAI into English, which is then simplified across multiple iterations 
-   using carefully-crafted Bedrock prompts
-4) an Avatar in Unreal Engine animates ASL gestures ("signs") corresponding to the simplified transcription
 
 ## Prerequisites (required)
 
@@ -259,13 +257,6 @@ Provide a link to the *GitHub issues page* for users to provide feedback.
 
 **Example:** *“For any feedback, questions, or suggestions, please use the issues tab under this repo.”*
 
-## Revisions (optional)
-
-Document all notable changes to this project.
-
-Consider formatting this section based on Keep a Changelog, and adhering to Semantic Versioning.
-
-
 ## License
 
 This library is licensed under the MIT-0 License. See the [LICENSE](LICENSE) file.
@@ -281,6 +272,8 @@ between AWS and its customers.
 
 ## Authors
 
-David Israel
-Daniel Zilberman
-Alain Krok
+We would like to acknowledge the contributions of these editors and reviewers.
+
+* David Israel, Sr Spatial Consultant
+* Daniel Zilberman, Sr Solutions Architect - Tech Solutions
+* Alain Krok, Sr Prototyping Architect
