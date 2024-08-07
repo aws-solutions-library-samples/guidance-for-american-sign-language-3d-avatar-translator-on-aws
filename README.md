@@ -56,7 +56,8 @@ engaging multimodal interface to view ASL translations.
 
 ## Reference Architecture
 
-![Alt text](assets/images/architecture.png?raw=true "Architecture")
+<!-- [Alt text](assets/images/architecture.png?raw=true "Architecture") -->
+![Reference Architecture](assets/images/american-sign-language-3d-avatar-translator-on-aws.7ad539a2a8f330eb3f8abcdd305401dc6a03c853.png?raw=true "Architecture") 
 
 ### Architecture Diagram Workflow
 1. User authenticates to the provided sample web interface via Amazon Cognito
