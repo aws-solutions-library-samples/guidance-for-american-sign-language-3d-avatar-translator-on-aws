@@ -16,20 +16,21 @@ Please check this repository for future updates as code becomes available.
 ## Table of Contents
 
 1. [Overview](#overview-required)
+    - [Architecture](#architecture)
     - [Cost](#cost)
-2. [High-level Workflow](#high-level-workflow)
-3. [Reference Architecture](#reference-architecture)
-4. [Prerequisites](#prerequisites-required)
+3. [High-level Workflow](#high-level-workflow)
+4. [Reference Architecture](#reference-architecture)
+5. [Prerequisites](#prerequisites-required)
     - [Operating System](#operating-system-required)
-5. [Deployment Steps](#deployment-steps-required)
-6. [Deployment Validation](#deployment-validation-required)
-7. [Running the Guidance](#running-the-guidance-required)
-8. [License](#License)
-9. [Next Steps](#next-steps)
-10. [Cleanup](#cleanup-required)
-11. [FAQ, known issues, additional considerations, and limitations] (#faq-known-issues-additional-considerations-and-limitations-optional)
-12. [Notices](#notices-optional)
-13. [Authors](#authors-optional)
+6. [Deployment Steps](#deployment-steps-required)
+7. [Deployment Validation](#deployment-validation-required)
+8. [Running the Guidance](#running-the-guidance-required)
+9. [License](#License)
+10. [Next Steps](#next-steps)
+11. [Cleanup](#cleanup-required)
+12. [FAQ, known issues, additional considerations, and limitations] (#faq-known-issues-additional-considerations-and-limitations-optional)
+13. [Notices](#notices-optional)
+14. [Authors](#authors-optional)
 
 ## Overview
 
@@ -54,7 +55,7 @@ engaging multimodal interface to view ASL translations.
    using carefully-crafted Bedrock prompts
 4) an Avatar in Unreal Engine animates ASL gestures ("signs") corresponding to the simplified transcription
 
-## Reference Architecture
+## Architecture
 
 <!-- [Alt text](assets/images/architecture.png?raw=true "Architecture") -->
 ![Reference Architecture](assets/images/american-sign-language-3d-avatar-translator-on-aws.7ad539a2a8f330eb3f8abcdd305401dc6a03c853.png?raw=true "Architecture") 
