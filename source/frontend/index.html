@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>AWS AugmentAbility</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <script src="https://kit.fontawesome.com/692060e681.js" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="style/shoelace.css" />
+        <link rel="stylesheet" href="style/styles.css" />
+        <script src="https://cdn.lordicon.com/libs/frhvbuzj/lord-icon-2.0.2.js"></script>
+        <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png" />
+        <link rel="manifest" href="manifest.json" crossorigin="use-credentials" />
+
+    </head>
+    <body>
+
+        <div>
+            <br />
+
+            <h2 style="text-align: center;">
+                <b>AWS AugmentAbility</b>
+            </h2>
+            <br />
+            <h4><b>Sign In</b></h4>
+            <br />
+            <div className="myform" >
+                <div className="myformgroup">
+                  <label for="username">Username:</label><br>
+                  <input type="text" id="username">
+                </div>
+                <div className="myformgroup">   
+                  <label for="pwd">Password:</label><br>
+                  <input type="password" name="pass" id="pwd">
+                  <br />
+                  <input type="checkbox" onclick="myFunction()"> Show Password
+                </div>
+                <br />
+                <div className="myformgroup">
+                  <button id="sign-in">Sign In</button>   
+                </div>
+            </div>
+            <br />
+            <br />
+            <br />
+            <p> <a href="https://github.com/aws-samples/aws-augmentability" >Source code</a> - <a href="https://raw.githubusercontent.com/aws-samples/aws-augmentability/main/THIRD_PARTY_LICENSES" >Credits</p>
+
+        </div>
+
+        <script>
+        function myFunction() {
+          var x = document.getElementById("pwd");
+          if (x.type === "password") {
+            x.type = "text";
+          } else {
+            x.type = "password";
+          }
+        }
+        </script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="lib/aws-sdk-2.1030.0.min.js"></script>
+        <script src="lib/aws-amplify.min.js"></script>
+        <script src="config.js"></script>
+        <script src="dist/main.js"></script>
+
+    </body>
+</html>

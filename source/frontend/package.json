@@ -1,0 +1,43 @@
+{
+  "name": "aws-augmentability",
+  "description": "AWS AugmentAbility",
+  "version": "1.0.0",
+  "author": {
+    "name": "Amazon Web Services",
+    "email": "",
+    "url": "http://aws.amazon.com/"
+  },
+  "scripts": {
+    "build": "browserify lib/main.js -o dist/main-temp.js -d",
+    "postbuild": "terser --output dist/main.js -- dist/main-temp.js"
+  },
+  "keywords": [],
+  "browserify": {
+    "transform": [
+      [
+        "babelify",
+        {
+          "presets": [
+            "@babel/env"
+          ]
+        }
+      ]
+    ]
+  },
+  "dependencies": {
+    "@aws-sdk/client-cognito-identity": "^3.379.1",
+    "@aws-sdk/eventstream-marshaller": "^3.120.0",
+    "@aws-sdk/util-utf8-node": "^3.208.0",
+    "aws-sdk": "^2.1354.0",
+    "browserify": "^16.5.2",
+    "local-web-server": "^3.0.7",
+    "microphone-stream": "^5.3.1",
+    "query-string": "^6.14.1",
+    "terser": "^5.16.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.5",
+    "@babel/preset-env": "^7.20.2",
+    "babelify": "^10.0.0"
+  }
+}

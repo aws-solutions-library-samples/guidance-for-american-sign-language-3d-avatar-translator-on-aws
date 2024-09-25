@@ -1,0 +1,11 @@
+node_modules
+cdk.out
+.idea/
+frontend/config_example.js
+.DS_STORE
+/lib/*/*.js
+/lib/*/*.d.ts
+/lib/*.js
+/lib/*.d.ts
+/bin/*.js
+/bin/*.d.ts

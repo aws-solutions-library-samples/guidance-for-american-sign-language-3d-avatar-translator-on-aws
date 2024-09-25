@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Live transcription</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <script
+            src="https://kit.fontawesome.com/692060e681.js"
+            crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="style/shoelace.css"/>
+    <link rel="stylesheet" href="style/styles.css"/>
+
+    <link
+            rel="apple-touch-icon"
+            sizes="180x180"
+            href="icons/apple-touch-icon.png"
+    />
+    <link
+            rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href="icons/favicon-32x32.png"
+    />
+    <link
+            rel="icon"
+            type="image/png"
+            sizes="16x16"
+            href="icons/favicon-16x16.png"
+    />
+    <link rel="manifest" href="manifest.json" crossorigin="use-credentials"/>
+</head>
+
+<body>
+<div>
+    <p style="text-align: left; font-size: 20px">
+        <a
+                href="index-landing.html"
+                title="Back to previous page"
+                style="color: #000000"
+        >
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <b>&nbsp;&nbsp;&nbsp;Transcription</b>
+    </p>
+
+    <!--
+          <h2 style="text-align: center;">
+              <b>Live transcription and text-to-speech</b>
+          </h2>
+          <br />
+          -->
+    <br><br><br><br>
+    <div class="language" style="text-align: left">
+        <label>Select a language:</label>
+        <select id="language">
+            <option selected value="zh-CN">Chinese</option>
+            <option selected value="ko-KR">Korean</option>
+            <option selected value="hi-IN">Hindi</option>
+            <option selected value="it-IT">Italian</option>
+            <option selected value="de-DE">German</option>
+            <option selected value="fr-FR">French (Canada)</option>
+            <option selected value="es-US">Spanish (US)</option>
+            <option selected value="en-US">US English</option>
+            </optgroup>
+        </select>
+    </div>
+
+    <style>
+        .avatar-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .avatar-image {
+            width: 90px; /* Adjust the width as needed */
+            height: auto; /* Maintain aspect ratio */
+            margin-bottom: 5px; /* Add spacing between images and radio buttons */
+        }
+    </style>
+    <div class="language" style="text-align: center">
+        <label>Select an avatar:</label>
+        <div class="avatar-container" id="avatarRadios">
+            <label>
+                <input type="radio" name="avatar" value="Ada" id="avatar-ada">
+                <img class="avatar-image" src="images/ada.png" alt="Ada">
+            </label>
+
+            <label>
+                <input type="radio" name="avatar" value="Taro" id="avatar-taro">
+                <img class="avatar-image" src="images/taro.png" alt="Taro">
+            </label>
+
+            <label>
+                <input type="radio" name="avatar" value="Hana" id="avatar-hana">
+                <img class="avatar-image" src="images/hana.png" alt="Hana">
+            </label>
+
+            <label>
+                <input type="radio" name="avatar" value="Bernice" id="avatar-bernice">
+                <img class="avatar-image" src="images/bernice.png" alt="Bernice">
+            </label>
+        </div>
+    </div>
+
+</div>
+<br/>
+
+<div class="container-box">
+    <input
+            type="radio"
+            class="tab-toggle"
+            name="tab-toggle"
+            id="tab1"
+            checked
+    />
+    <input type="radio" class="tab-toggle" name="tab-toggle" id="tab2"/>
+
+    <ul class="tab-list">
+        <li class="tab-item">
+            <label class="tab-trigger" for="tab1"
+            >
+                <tab-text>Listen</tab-text>
+            </label
+            >
+        </li>
+    </ul>
+
+    <div class="tab-container">
+        <div class="tab-content">
+            <div id="transcription-div">
+                <div class="controlActions">
+                    <div class="controlButtons">
+                        <a href="#" id="start-button" title="Start listening"
+                        ><i class="fas fa-microphone"></i
+                        ></a>
+                        <a
+                                href="#"
+                                style="display: none"
+                                id="stop-button"
+                                title="Stop listening"
+                        ><i class="fas fa-stop"></i
+                        ></a>
+                    </div>
+                </div>
+
+                <div id="error" class="isa_error"></div>
+
+                <div id="listening-animation" style="display: none">
+                    <div class="listening-animation-subelement"></div>
+                    <div class="listening-animation-subelement"></div>
+                    <div class="listening-animation-subelement"></div>
+                    <div class="listening-animation-subelement"></div>
+                    <div class="listening-animation-subelement"></div>
+                    <div class="listening-animation-subelement"></div>
+                    <div class="listening-animation-subelement"></div>
+                </div>
+
+                <textarea
+                        id="transcript"
+                        placeholder="The transcription will show up here"
+                        rows="10"
+                ></textarea>
+
+                <div style="text-align: left">
+                    <button
+                            id="reset-button"
+                            class="button-l button-secondary"
+                            title="Clear Transcription"
+                    >
+                        Clear
+                    </button>
+                    <button
+                            id="send-button"
+                            class="button-l button-secondary"
+                            title="Send (Manually)"
+                    >
+                        Send (Manually)
+                    </button>
+                    <br/>
+                </div>
+            </div>
+        </div>
+        <div class="simplification_iterations" style="text-align: left">
+            <label>Simplification Iterations:</label>
+            <select id="simplification_iterations">
+                <optgroup>
+                    <option selected value="0">0</option>
+                    <option selected value="1">1</option>
+                    <option selected value="2">2</option>
+                    <option selected value="3">3</option>
+                </optgroup>
+            </select>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="lib/aws-sdk-2.1030.0.min.js"></script>
+    <script src="lib/aws-amplify.min.js"></script>
+    <script src="config.js"></script>
+    <script src="dist/main.js"></script>
+</body>
+</html>
