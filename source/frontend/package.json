@@ -30,7 +30,7 @@
     "@aws-sdk/util-utf8-node": "^3.208.0",
     "aws-sdk": "^2.1354.0",
     "browserify": "^16.5.2",
-    "local-web-server": "^3.0.7",
+    "local-web-server": "^5.4.0",
     "microphone-stream": "^5.3.1",
     "query-string": "^6.14.1",
     "terser": "^5.16.1"
