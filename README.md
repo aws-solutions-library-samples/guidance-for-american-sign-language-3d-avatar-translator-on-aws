@@ -1,5 +1,24 @@
 # Guidance for American Sign Language (ASL) 3D Avatar Translator on AWS
 
+## Table of Contents
+
+1. [Overview](#overview)
+    - [Architecture](#architecture)
+    - [Cost](#cost)
+3. [High-level Workflow](#high-level-workflow)
+4. [Reference Architecture](#reference-architecture)
+5. [Prerequisites](#prerequisites-required)
+    - [Operating System](#operating-system-required)
+6. [Deployment Steps](#deployment-steps-required)
+7. [Deployment Validation](#deployment-validation-required)
+8. [Running the Guidance](#running-the-guidance-required)
+9. [License](#License)
+10. [Next Steps](#next-steps)
+11. [Cleanup](#cleanup)
+12. [FAQ, known issues, additional considerations, and limitations] (#faq-known-issues-additional-considerations-and-limitations-optional)
+13. [Notices](#notices)
+14. [Authors](#authors)
+
 ![Alt text](assets/images/rainbow-example.png?raw=true "Sample Translation")
 <video src="https://github.com/aws-solutions-library-samples/guidance-for-american-sign-language-3d-avatar-translator-on-aws/assets/156058749/a612dfd9-dba3-4ba3-af6d-baf187f13119"></video>
 
@@ -13,24 +32,7 @@ includes the following major components:
 
 Please check this repository for future updates as code becomes available.
 
-## Table of Contents
 
-1. [Overview](#overview-required)
-    - [Architecture](#architecture)
-    - [Cost](#cost)
-3. [High-level Workflow](#high-level-workflow)
-4. [Reference Architecture](#reference-architecture)
-5. [Prerequisites](#prerequisites-required)
-    - [Operating System](#operating-system-required)
-6. [Deployment Steps](#deployment-steps-required)
-7. [Deployment Validation](#deployment-validation-required)
-8. [Running the Guidance](#running-the-guidance-required)
-9. [License](#License)
-10. [Next Steps](#next-steps)
-11. [Cleanup](#cleanup-required)
-12. [FAQ, known issues, additional considerations, and limitations] (#faq-known-issues-additional-considerations-and-limitations-optional)
-13. [Notices](#notices-optional)
-14. [Authors](#authors-optional)
 
 ## Overview
 
@@ -58,6 +60,7 @@ engaging multimodal interface to view ASL translations.
 ## Architecture
 
 <!-- [Alt text](assets/images/architecture.png?raw=true "Architecture") -->
+
 ![Reference Architecture](assets/images/american-sign-language-3d-avatar-translator-on-aws.7ad539a2a8f330eb3f8abcdd305401dc6a03c853.png?raw=true "Architecture") 
 
 ### Architecture Diagram Workflow
@@ -89,7 +92,7 @@ engaging multimodal interface to view ASL translations.
 7. User can remotely access the Amazon EC2 instance through Remote Desktop Protocol or NiceDCV to visualize the 
    3D avatar that is performing ASL translation.
    
-### Cost ( required )
+### Cost
 
 This section is for a high-level cost estimate. Think of a likely straightforward scenario with reasonable assumptions based on the problem the Guidance is trying to solve. If applicable, provide an in-depth cost breakdown table in this section.
 
@@ -229,7 +232,7 @@ Suggested future enhancements:
   * Stream ASL animations to major chat programs, batch offline processing of videos 
 * Extend translation capability to other sign-language variants
 
-## Cleanup (required)
+## Cleanup
 
 - Include detailed instructions, commands, and console actions to delete the deployed Guidance.
 - If the Guidance requires manual deletion of resources, such as the content of an S3 bucket, please specify.
