@@ -1,0 +1,47 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "5.3",
+	"Category": "Samples",
+	"Description": "ASLMetaHuman Demo by AWS",
+	"Modules": [
+		{
+			"Name": "ASLMetaHuman",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine"
+			]
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "ControlRig",
+			"Enabled": true
+		},
+		{
+			"Name": "HairStrands",
+			"Enabled": true
+		},
+		{
+			"Name": "RigLogic",
+			"Enabled": true
+		},
+		{
+			"Name": "LiveLink",
+			"Enabled": false
+		},
+		{
+			"Name": "LiveLinkControlRig",
+			"Enabled": false
+		},
+		{
+			"Name": "PixelStreaming",
+			"Enabled": false
+		}
+	],
+	"TargetPlatforms": [
+		"WindowsNoEditor",
+		"Windows"
+	],
+	"EpicSampleNameHash": "1807116563"
+}
