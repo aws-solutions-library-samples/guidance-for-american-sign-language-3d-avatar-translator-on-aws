@@ -25,8 +25,19 @@ using UnrealBuildTool;
 public class ASLMetaHuman : ModuleRules
 {
     private readonly List<string> LibraryNames = new() {
+		"aws-c-auth",
+		"aws-c-cal",
         "aws-c-common",
+		"aws-c-compression",
+		"aws-c-event-stream",
+		"aws-c-http",
+		"aws-c-io",
+		"aws-c-mqtt",
+		"aws-c-s3",
+		"aws-c-sdkutils",
+		"aws-checksums",
         "aws-cpp-sdk-core",
+		"aws-cpp-sdk-s3",
         "aws-cpp-sdk-sqs",
         "aws-crt-cpp"
     };
