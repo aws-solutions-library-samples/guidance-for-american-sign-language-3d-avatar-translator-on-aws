@@ -49,7 +49,22 @@ public:
     static void SetReadyForNextTranslateMessage(const bool State) {
         FScopeLock ScopeLock(&MutexReadyForNextTranslationMessage);
         ReadyForNextMessage = State;
+        if (ReadyForNextMessage)
+        {
+            SetIsReadyForNewBackgroundMessage(true);
+        }
     }
+
+    static bool IsReadyForNewBackgroundMessage() {
+        FScopeLock ScopeLock(&MutexReadyForNextBackgroundMessageMessage);
+        return ReadyForNextBackgroundMessage;
+    }
+
+    static void SetIsReadyForNewBackgroundMessage(const bool State) {
+        FScopeLock ScopeLock(&MutexReadyForNextBackgroundMessageMessage);
+        ReadyForNextBackgroundMessage = State;
+    }
+
 
 private:
     bool GetQueueUrl(const Aws::String & QueueName, Aws::String & QueueUrl) const;
@@ -69,7 +84,9 @@ private:
     //
     static inline bool AbortActive = false;
     static inline bool ReadyForNextMessage = true;
+    static inline bool ReadyForNextBackgroundMessage = true;
     static inline FCriticalSection MutexAbortActive;
     static inline FCriticalSection MutexReadyForNextTranslationMessage;
+    static inline FCriticalSection MutexReadyForNextBackgroundMessageMessage;
 };
 }

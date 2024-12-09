@@ -66,6 +66,7 @@ void ASLMetaHumanAnimateSentenceAction::GetASLTense(const ASLMetaHumanAction & A
     } else if (Tense.ToLower().Equals(TenseFuture)) {
         Tense = ASLTenseFuture;
     }
+    Tense = Tense.ToUpper();
 }
 
 // Returns the ASL-formed text value corresponding to an Action object; possibly an empty value if omitted.

@@ -3,7 +3,7 @@ import json
 import os
 import uuid
 
-sns = boto3.client('sns')
+sns_obj = boto3.client('sns')
 
 def lambda_handler(event, context):
     print(event)
@@ -14,7 +14,7 @@ def lambda_handler(event, context):
         
     try:
         topic = os.environ['snsTopicArn']
-        response = sns.publish(
+        response = sns_obj.publish(
             TopicArn=topic,
             Message=json.dumps(output),
             MessageStructure='string',

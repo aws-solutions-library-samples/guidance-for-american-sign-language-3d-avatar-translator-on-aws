@@ -98,31 +98,31 @@ private:
     }
 
     void ActionHandler(const ASLMetaHumanAction & Action);
-    bool AnimateIndividualLettersForToken(const FString & Token) const;
+    bool AnimateIndividualLettersForToken(const FString & Token);
     void AnimateSentence(const FString & Sentence,
             const FString & ASLText,
             const EASLMetaHumanSentimentType Sentiment = EASLMetaHumanSentimentType::NONE,
-            const bool Verbose = false) const;
-    bool AnimateSequence(const FString & Token, const float Rate, const float StartPosition) const;
-    bool AnimateToken(const FString & Token, const bool FinalToken = false) const;
+            const bool Verbose = false);
+    bool AnimateSequence(const FString & Token, const float Rate, const float StartPosition);
+    bool AnimateToken(const FString & Token, const bool FinalToken = false);
     void AssignBackgroundTexture(const FString & SignedUrl, const bool Verbose = false);
-    void ChangeSignRate(const float SignRate, const bool Verbose = false) const;
-    void DisplaySentencePairs(const FString & Sentence, const FString & ASLText) const;
-    void DisplaySentiment(const EASLMetaHumanSentimentType SentimentType) const;
-    void DisplayToken(const FString & Token) const;
-    void DisplayTokenComponent(const FString & Token) const;
+    void ChangeSignRate(const float SignRate, const bool Verbose = false);
+    void DisplaySentencePairs(const FString & Sentence, const FString & ASLText);
+    void DisplaySentiment(const EASLMetaHumanSentimentType SentimentType);
+    void DisplayToken(const FString & Token);
+    void DisplayTokenComponent(const FString & Token);
     void DisplayVersion();
-    float GetAnimationDuration(const FString & Token) const;
+    float GetAnimationDuration(const FString & Token);
     bool Init();
     void InitAnimations();
-    void InitAnimationSequences(const FString & AnimationPath) const;
+    void InitAnimationSequences(const FString & AnimationPath);
     bool InitInternalUEObjectReferences();
     void InitSQSBackgroundWorker();
     bool InitUEObjectsAndEnvironment();
     void OnAssign2DTextureToBackground(const UTexture2DDynamic * DynamicTexture);
     void RunInternalTestAction(const FString & JsonPayload);
-    void ResetToBeginState() const;
-    void StopAllAnimations(const bool Verbose = false) const;
+    void ResetToBeginState();
+    void StopAllAnimations(const bool Verbose = false);
     void SwapWithActiveAvatar(const TWeakObjectPtr<AActor> & BPActorNewPtr);
     bool SwitchAvatar(const FString & AvatarName, const bool Verbose = false);
 
@@ -162,7 +162,7 @@ private:
     // Background Plane Actor (for changing backgrounds) and Heads Up Display Actor
     //
     TWeakObjectPtr<AStaticMeshActor> PlaneActorPtr;
-    TWeakObjectPtr<AStaticMeshActor> PlaneHUDActorPtr;
+    //TWeakObjectPtr<AStaticMeshActor> PlaneHUDActorPtr;
 
     // Stores references to animation sequences by character and whole word (if it is defined)
     // Note: this likely won't scale well for a complete ASL alphabet and should instead
@@ -197,5 +197,14 @@ private:
     // X,Y position for status update text
     //
     FVector2D GeneralStatusPosition;
+
+    // On-screen message hiding triggers to avoid having to pre-compute animation durations.
+    // Changing their value will trigger HUD/UI element visibility changes. Consider packing into a structure.
+    //
+    FThreadSafeBool HideSimplifiedSentenceTrigger = false;
+    FThreadSafeBool HideASLSentenceTrigger = false;
+    FThreadSafeBool HideTokenTextTrigger = false;
+    FThreadSafeBool HideTokenComponentTextTrigger = false;
+    FThreadSafeBool HideSentimentTrigger = false;
 };
 }

@@ -89,6 +89,8 @@ unsigned int UnrealAPI::CountCharOccurrences(const FString & InString, const cha
 
 // Converts UTexture2DDynamic into UTexture2D (static texture), making it usable for UMaterial objects.
 // Reference: https://forums.unrealengine.com/t/how-do-i-convert-a-utexture2ddynamic-to-utexture2d/404375/2
+// Note: this approach could be made more efficient by using other mechanisms (since the current approach 
+// could incur significant time slice from the Game Thread, which would produce cause delays)
 //
 void UnrealAPI::ConvertTexture(const UTexture2DDynamic * DynamicTexture, TWeakObjectPtr<UTexture2D> & StaticTexture) {
     StaticTexture = UTexture2D::CreateTransient(DynamicTexture->SizeX, DynamicTexture->SizeY, DynamicTexture->Format);
@@ -109,8 +111,9 @@ void UnrealAPI::ConvertTexture(const UTexture2DDynamic * DynamicTexture, TWeakOb
                             TextureResource->GetTexture2DRHI(), 0, EResourceLockMode::RLM_ReadOnly, DestStride, false));
                     FColor * DestDataPtr = static_cast<FColor *>(
                             StaticTexture->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_WRITE));
-                    // Warning: there are concerns about texture data truncation in large payloads (which may be
+                    // Warning: there are concerns about texture data truncation/overflow in large payloads (which may be
                     // connected with the incoming data itself and how it's being handled in the core UE code)
+                    // Review the SIZE_T and int32 storage.
                     //
                     FMemory::Memcpy(
                             DestDataPtr, SrcDataPtr, DynamicTexture->SizeX * DynamicTexture->SizeY * sizeof(FColor));
@@ -267,7 +270,7 @@ bool UnrealAPI::SetFirstPlayerCameraView(const float FieldOfView,
 // time period expires (or prior if TriggerHideMessage changes its reference/signal value to true).
 //
 void UnrealAPI::PerformTimedMessageDisappearance(const float DurationSeconds,
-        bool & TriggerHideMessage,
+        FThreadSafeBool & TriggerHideMessage,
         TSharedRef<STextBlock> & TextBlock) {
     FFunctionGraphTask::CreateAndDispatchWhenReady(
             [&TriggerHideMessage, DurationSeconds, TextBlock]() {
@@ -282,7 +285,6 @@ void UnrealAPI::PerformTimedMessageDisappearance(const float DurationSeconds,
                     }
                     FPlatformProcess::Sleep(FInternalSettings::GetAnimationSpinlockSeconds());
                 }
-                TriggerHideMessage = false;
                 HideWidget<STextBlock>(TextBlock);
             },
             TStatId(), nullptr, ENamedThreads::AnyThread);
@@ -320,7 +322,7 @@ void UnrealAPI::ShowMessage(const FString & Message,
         const FVector2D & Location,
         const FColor & TextColor,
         const FColor & TextHighlightColor) {        
-    bool TriggerHide = false;
+    FThreadSafeBool TriggerHide = false;
     ShowMessage(Message, DurationSeconds, FontPtr, FontSize, Location, TriggerHide, TextColor, TextHighlightColor);
 }
 
@@ -335,7 +337,7 @@ void UnrealAPI::ShowMessage(const FString & Message,
         const UFont * FontPtr,
         const unsigned int FontSize,
         const FVector2D & Location,
-        bool & TriggerHideMessage,
+        FThreadSafeBool & TriggerHideMessage,
         const FColor & TextColor,
         const FColor & TextHighlightColor) {
     if (WantNoMessages || Message.IsEmpty() || (nullptr == FontPtr)) {

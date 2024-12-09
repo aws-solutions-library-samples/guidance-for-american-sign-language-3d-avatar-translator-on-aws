@@ -10,7 +10,7 @@ MODEL_ID = "stability.stable-diffusion-xl-v1"
 CONTENT_TYPE = "application/json"
 HTTP_STATUS_OK = 200
 
-sns = boto3.client('sns')
+sns_obj = boto3.client('sns')
 aws_region = boto3.Session().region_name
 bedrock_client = boto3.client(
     service_name='bedrock-runtime',
@@ -51,7 +51,7 @@ def generate_image(image_input_details):
             }
         }
         print(f"publish message to sns :: {message}")
-        sns_response = sns.publish(
+        sns_response = sns_obj.publish(
             TopicArn=TEXT_TO_IMAGE_TOPIC_ARN,
             Message=json.dumps({'default': json.dumps(message)}),
             MessageStructure='json',

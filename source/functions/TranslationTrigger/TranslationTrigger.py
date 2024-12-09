@@ -68,9 +68,9 @@ TOP_K = 80
 HTTP_STATUS_OK = 200
 HTTP_STATUS_FAILURE = 500
 
-sns = boto3.client('sns')
-bedrock = boto3.client(service_name="bedrock-runtime",region_name="us-east-1")
-comprehend = boto3.client(service_name="comprehend",region_name="us-east-1")
+sns_obj = boto3.client('sns')
+bedrock_obj = boto3.client(service_name="bedrock-runtime", region_name="us-east-1")
+comprehend_obj = boto3.client(service_name="comprehend", region_name="us-east-1")
 
 
 def run_bedrock_translation(inner_prompt):
@@ -80,7 +80,7 @@ def run_bedrock_translation(inner_prompt):
                        "top_p": TOP_P,
                        "top_k": TOP_K})
     try:
-        response = bedrock.invoke_model(body=body, modelId=MODEL_ID, accept=CONTENT_TYPE, contentType=CONTENT_TYPE)
+        response = bedrock_obj.invoke_model(body=body, modelId=MODEL_ID, accept=CONTENT_TYPE, contentType=CONTENT_TYPE)
         response_body = json.loads(response.get('body').read())
         completion = response_body.get("completion").replace("\"", "").replace("\n", "").replace("\.",
                                                                                                  """).replace("\,", """)
@@ -99,7 +99,7 @@ def is_toxic(text):
 
 
 def is_comprehend_toxic(text):
-    response = comprehend.detect_toxic_content(
+    response = comprehend_obj.detect_toxic_content(
         TextSegments=[{"Text": text}],
         LanguageCode='en'
     )
@@ -179,7 +179,7 @@ def process_message(message, iterations):
         print("Output: pre-ASL/ASL:", [simplified_text, tense, asl_text])
 
     if simplified_text != UNETHICAL_MESSAGE_RESPONSE:
-        sentiment = comprehend.detect_sentiment(Text=message, LanguageCode='en')['Sentiment']
+        sentiment = comprehend_obj.detect_sentiment(Text=message, LanguageCode='en')['Sentiment']
     else:
         # Do we already know if the message was toxic? If so, avoid re-pinging comprehend
         #
@@ -222,7 +222,7 @@ def lambda_handler(event, context):
         }
 
         topic = os.environ['snsTopicArn']
-        response = sns.publish(
+        response = sns_obj.publish(
             TopicArn=topic,
             Message=json.dumps(output),
             MessageStructure='string',

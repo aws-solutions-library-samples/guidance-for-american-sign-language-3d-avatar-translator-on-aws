@@ -33,7 +33,7 @@ private:
             const FColor & TextHighlightColor,
             TSharedPtr<STextBlock> & TextBlock);
     static void PerformTimedMessageDisappearance(const float DurationSeconds,
-            bool & TriggerHideMessage,
+            FThreadSafeBool & TriggerHideMessage,
             TSharedRef<STextBlock> & TextBlock);
     // Assist with UClass-specific utility method access
     //
@@ -90,7 +90,7 @@ public:
             const UFont * FontPtr,
             const unsigned int FontSize,
             const FVector2D & Location,
-            bool & TriggerHideMessage,
+            FThreadSafeBool & TriggerHideMessage,
             const FColor & TextColor = FColor::White,
             const FColor & TextHighlightColor = FColor::Black);
     static inline FCriticalSection MutexPlayAnimation;

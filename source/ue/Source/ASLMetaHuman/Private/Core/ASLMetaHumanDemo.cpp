@@ -77,9 +77,9 @@ const FString & LetterIAsAlphabetSymbol {"_I"};
 const FString & AnimationNameWordDelimiterStr {"_"};
 const FString & AnimationNameWordSpaceStr {" "};
 // Consider changing plane names (for HUD and background plane) to more meaningful identifiers
+// Warning: ensure that these objects exist, else initialization will fail - check the scan of scene objects.
 //
 const FString & BackgroundPlaneName {"Plane_2"};
-const FString & BackgroundHUDPlaneName {"Plane_1"};
 // Action Update HUD Messages
 //
 const FString & AnimateSentenceMessage {"ANIMATE SENTENCE"};
@@ -103,14 +103,6 @@ constexpr int SentimentHorizontalLocation = 50;
 constexpr int SentimentFontSize = 40;
 constexpr float StatusHorizontalProportion = 0.75;
 constexpr int StatusVerticalOffset = -50;
-// On-screen message hiding triggers to avoid having to pre-compute animation durations.
-// Changing their value will trigger HUD/UI element visibility changes. Consider packing into a structure.
-//
-bool HideSimplifiedSentenceTrigger = false;
-bool HideASLSentenceTrigger = false;
-bool HideTokenTextTrigger = false;
-bool HideTokenComponentTextTrigger = false;
-bool HideSentimentTrigger = false;
 }
 
 // Early initialization: note: should only have one instance of this demo active!
@@ -155,6 +147,7 @@ void ASLMetaHumanDemo::Shutdown() {
             SQSWorkerTaskPtr.Reset();
         }
         if (nullptr != DemoInstancePtr) {
+            FPlatformProcess::Sleep(FInternalSettings::GetAnimationSpinlockSeconds());    
             DemoInstancePtr.Reset();
         }
     }
@@ -241,7 +234,7 @@ void ASLMetaHumanDemo::ActionHandler(const ASLMetaHumanAction & Action) {
 // Consider memory and compute efficiency - an on-demand MoCap/Live Link data streaming could be used instead
 // to produce similar animation data, which would need to be re-targeted to a skeleton.
 //
-void ASLMetaHumanDemo::InitAnimationSequences(const FString & AnimationPath) const {
+void ASLMetaHumanDemo::InitAnimationSequences(const FString & AnimationPath) {
     TArray<TWeakObjectPtr<UAnimSequence>> AnimationSequencesPtr;
     if (UnrealAPI::GetAssets<UAnimSequence>(AnimationPath, AnimationSequencesPtr)) {
         const unsigned int NumSequences = static_cast<unsigned int>(AnimationSequencesPtr.Num());
@@ -300,40 +293,55 @@ bool ASLMetaHumanDemo::InitInternalUEObjectReferences() {
         return false;
     }
     PlaneActorPtr->AddToRoot();
-    if (! UnrealAPI::GetActorByName<AStaticMeshActor>(BackgroundHUDPlaneName, WorldPtr.Get(), PlaneHUDActorPtr)) {
-        return false;
-    }
-    PlaneHUDActorPtr->AddToRoot();
     return true;
 }
 
 // Adjusts UI and related state tracking to a default state (to accept new requests, clear UI elements)
 //
-void ASLMetaHumanDemo::ResetToBeginState() const {
+void ASLMetaHumanDemo::ResetToBeginState() {
     SetCancellingState(false);
     SetReadyToAnimateNextToken(true);
     SetReadyToAnimateNextSentence(true);
     FAsynchronousSqsWorker::SetReadyForNextTranslateMessage(true);
-    HideSimplifiedSentenceTrigger = true;
-    HideASLSentenceTrigger = true;
-    HideTokenTextTrigger = true;
-    HideTokenComponentTextTrigger = true;
-    HideSentimentTrigger = true;
+    HideSimplifiedSentenceTrigger.AtomicSet(true);
+    HideASLSentenceTrigger.AtomicSet(true);
+    HideTokenTextTrigger.AtomicSet(true);
+    HideTokenComponentTextTrigger.AtomicSet(true);
+    HideSentimentTrigger.AtomicSet(true);
     // Reset the generated background to a default texture
     //
     auto BackgroundStaticMeshComponent = PlaneActorPtr->GetStaticMeshComponent();
-    if (! FUISettings::GetUseEntireBackgroundForImages()) {
-        BackgroundStaticMeshComponent = PlaneHUDActorPtr->GetStaticMeshComponent();
-    }
     if ((nullptr == BackgroundStaticMeshComponent) || (! BackgroundStaticMeshComponent->IsValidLowLevelFast())) {
         return;
     }
-    BackgroundStaticMeshComponent->SetMaterial(0, DefaultBackgroundMaterialInterfacePtr->GetMaterial());
+
+    if ((nullptr == DefaultBackgroundMaterialInterfacePtr)
+            || (! DefaultBackgroundMaterialInterfacePtr->IsValidLowLevelFast())) {
+
+        const auto Task = FFunctionGraphTask::CreateAndDispatchWhenReady(
+                [&]() {
+                    if (! UnrealAPI::GetMaterial(
+                                DefaultBackgroundMaterialPath, DefaultBackgroundMaterialInterfacePtr)) {
+                        return;
+                    }
+                },
+                TStatId(), nullptr, ENamedThreads::GameThread);
+        Task->Wait();
+    }
+    if ((nullptr != DefaultBackgroundMaterialInterfacePtr)
+            && (DefaultBackgroundMaterialInterfacePtr->IsValidLowLevelFast())) {
+        const auto Task = FFunctionGraphTask::CreateAndDispatchWhenReady(
+                [&]() {
+                    BackgroundStaticMeshComponent->SetMaterial(0, DefaultBackgroundMaterialInterfacePtr->GetMaterial());
+                },
+                TStatId(), nullptr, ENamedThreads::GameThread);
+        Task->Wait();
+    }
 }
 
 // Stop any existing animation in progress to avoid conflicts with those animations. Prior active actor can be GC'd.
 //
-void ASLMetaHumanDemo::StopAllAnimations(const bool Verbose) const {
+void ASLMetaHumanDemo::StopAllAnimations(const bool Verbose) {
     SetReadyToAnimateNextSentence(false);
     if (Verbose) {
         UnrealAPI::ShowMessage(StoppingAnimationMessage, UpdateMessageDurationSeconds, FontPtr.Get(),
@@ -343,12 +351,14 @@ void ASLMetaHumanDemo::StopAllAnimations(const bool Verbose) const {
             [&]() {
                 SetCancellingState(true);
                 FPlatformProcess::Sleep(1.0f);
+                ResetToBeginState();
                 FFunctionGraphTask::CreateAndDispatchWhenReady(
                         [&]() {
                             if ((nullptr != SkeletalMeshBodyComponentInternalPtr)
-                                    && SkeletalMeshBodyComponentInternalPtr->IsValidLowLevel()) {
+                                    && SkeletalMeshBodyComponentInternalPtr->IsValidLowLevel()) { 
+                                FPlatformProcess::Sleep(FInternalSettings::GetAnimationSpinlockSeconds()
+                                        * FInternalSettings::GetHideMessageSynchronizationMultiplier());
                                 SkeletalMeshBodyComponentInternalPtr->Stop();
-                                ResetToBeginState();
                             }
                         },
                         TStatId(), nullptr, ENamedThreads::GameThread);
@@ -359,16 +369,16 @@ void ASLMetaHumanDemo::StopAllAnimations(const bool Verbose) const {
 // Displays a HUD message containing a simplified English sentence and its ASL text approximation beneath.
 // Note: message will be cleared externally.
 //
-void ASLMetaHumanDemo::DisplaySentencePairs(const FString & Sentence, const FString & ASLText) const {
+void ASLMetaHumanDemo::DisplaySentencePairs(const FString & Sentence, const FString & ASLText) {
     FVector2D MessagePosition;
     FUISettings::GetSentencePosition(MessagePosition);
     FVector2D ASLTextPosition;
     FUISettings::GetASLTextPosition(ASLTextPosition);
     const FString & Message = FString::Format(SentenceOutputFormat, TArray<FStringFormatArg>({Sentence}));
     const FString & ASLMessage = FString::Format(ASLOutputFormat, TArray<FStringFormatArg>({ASLText}));
-    HideSimplifiedSentenceTrigger = false;
-    HideASLSentenceTrigger = false;
-    HideSentimentTrigger = false;
+    HideSimplifiedSentenceTrigger.AtomicSet(false);
+    HideASLSentenceTrigger.AtomicSet(false);
+    HideSentimentTrigger.AtomicSet(false);
     UnrealAPI::ShowMessage(Message, FLT_MAX, FontPtr.Get(), FUISettings::GetFontSize(), MessagePosition,
             HideSimplifiedSentenceTrigger, FColor::Green);
     UnrealAPI::ShowMessage(ASLMessage, FLT_MAX, FontPtr.Get(), FUISettings::GetFontSize(), ASLTextPosition,
@@ -377,12 +387,12 @@ void ASLMetaHumanDemo::DisplaySentencePairs(const FString & Sentence, const FStr
 
 // Displays a HUD message containing an ASL Sign/Token. Note: message will be cleared externally.
 //
-void ASLMetaHumanDemo::DisplayToken(const FString & Token) const {
+void ASLMetaHumanDemo::DisplayToken(const FString & Token) {
     FString TokenOutput = FString::Format(TEXT("Token: {0}"), TArray<FStringFormatArg>({Token}));
     TokenOutput = TokenOutput.Replace(*AnimationNameWordDelimiterStr, *AnimationNameWordSpaceStr);
     FVector2D Position;
     FUISettings::GetTokenPosition(Position);
-    HideTokenTextTrigger = false;
+    HideTokenTextTrigger.AtomicSet(false);
     UnrealAPI::ShowMessage(TokenOutput, FLT_MAX, FontPtr.Get(), FUISettings::GetFontSize(), Position,
             HideTokenTextTrigger, FColor::Yellow);
 }
@@ -390,10 +400,10 @@ void ASLMetaHumanDemo::DisplayToken(const FString & Token) const {
 // Displays a HUD message containing an ASL Sign/Token's component (a subset of the token that's possibly one or more words or one letter).
 // Note: message will be cleared based on the animation duration of the token.
 //
-void ASLMetaHumanDemo::DisplayTokenComponent(const FString & Token) const {
+void ASLMetaHumanDemo::DisplayTokenComponent(const FString & Token) {
     FVector2D Position;
     FUISettings::GetLetterPosition(Position);
-    HideTokenComponentTextTrigger = false;
+    HideTokenComponentTextTrigger.AtomicSet(false);
     UnrealAPI::ShowMessage(Token, GetAnimationDuration(Token), FontPtr.Get(), FUISettings::GetSignFontSize(),
             Position, HideTokenComponentTextTrigger, FColor::Red);
 }
@@ -401,7 +411,7 @@ void ASLMetaHumanDemo::DisplayTokenComponent(const FString & Token) const {
 // Displays a HUD message containing a color-colored message with emoji (based on SentimentType)
 // Note: Message will be cleared externally. Consider externally configuring this message's placement.
 //
-void ASLMetaHumanDemo::DisplaySentiment(const EASLMetaHumanSentimentType SentimentType) const {
+void ASLMetaHumanDemo::DisplaySentiment(const EASLMetaHumanSentimentType SentimentType) {
     FString Message;
     FColor Color;
     switch (SentimentType) {
@@ -435,7 +445,7 @@ void ASLMetaHumanDemo::DisplaySentiment(const EASLMetaHumanSentimentType Sentime
 
 // Adjusts the speed (by SignRate) by which the active Skeleton animates
 //
-void ASLMetaHumanDemo::ChangeSignRate(const float SignRate, const bool Verbose) const {
+void ASLMetaHumanDemo::ChangeSignRate(const float SignRate, const bool Verbose) {
     if (Verbose) {
         UnrealAPI::ShowMessage(ChangingSignRateMessage, UpdateMessageDurationSeconds, FontPtr.Get(),
                 FUISettings::GetFontSize(), FVector2D(0, 0), FColor::Red);
@@ -462,13 +472,7 @@ void ASLMetaHumanDemo::OnAssign2DTextureToBackground(const UTexture2DDynamic * D
     if ((nullptr == PlaneActorPtr) || (! PlaneActorPtr->IsValidLowLevelFast())) {
         return;
     }
-    if ((nullptr == PlaneHUDActorPtr) || (! PlaneHUDActorPtr->IsValidLowLevelFast())) {
-        return;
-    }
     auto BackgroundStaticMeshComponent = PlaneActorPtr->GetStaticMeshComponent();
-    if (! FUISettings::GetUseEntireBackgroundForImages()) {
-        BackgroundStaticMeshComponent = PlaneHUDActorPtr->GetStaticMeshComponent();
-    }
     if ((nullptr == BackgroundStaticMeshComponent) || (! BackgroundStaticMeshComponent->IsValidLowLevelFast())) {
         return;
     }
@@ -593,19 +597,12 @@ bool ASLMetaHumanDemo::InitUEObjectsAndEnvironment() {
     // Background image planes
     //
     PlaneActorPtr->SetActorHiddenInGame(FUserSettings::GetHideBackgroundPlane());
-    PlaneHUDActorPtr->SetActorHiddenInGame(
-            FUserSettings::GetHideBackgroundPlane() || FUISettings::GetUseEntireBackgroundForImages());
-    const FVector PlaneInitialLocation = PlaneHUDActorPtr->GetActorLocation();
     FVector PlaneLocationOffset;
     FUISettings::GetBackgroundImagePlaneLocationOffset(PlaneLocationOffset);
-    PlaneHUDActorPtr->SetActorLocation(PlaneInitialLocation + PlaneLocationOffset);
-    const FRotator PlaneInitialRotator = PlaneHUDActorPtr->GetActorRotation();
     FVector PlaneRotationOffset;
     FUISettings::GetBackgroundImagePlaneRotationOffset(PlaneRotationOffset);
-    PlaneHUDActorPtr->SetActorRotation(PlaneInitialRotator + PlaneRotationOffset.Rotation());
     FVector PlaneScale;
     FUISettings::GetBackgroundImagePlaneScale(PlaneScale);
-    PlaneHUDActorPtr->SetActorScale3D(PlaneScale);
     // Other background and lighting elements
     //
     for (TActorIterator<ASkyAtmosphere> ActorIterator(WorldPtr.Get()); ActorIterator; ++ActorIterator) {
@@ -667,7 +664,7 @@ bool ASLMetaHumanDemo::InitUEObjectsAndEnvironment() {
 void ASLMetaHumanDemo::AnimateSentence(const FString & Sentence,
         const FString & ASLText,
         const EASLMetaHumanSentimentType Sentiment,
-        const bool Verbose) const {
+        const bool Verbose) {
     const auto & Task = FFunctionGraphTask::CreateAndDispatchWhenReady(
             [&, Sentence, ASLText, Sentiment, Verbose]() {
                 // Sentence in progress? Don't conflict with existing animation
@@ -693,8 +690,8 @@ void ASLMetaHumanDemo::AnimateSentence(const FString & Sentence,
                 for (const auto & Token: Tokens) {
                     while (! IsReadyToAnimateNextToken()) {
                         if (FGlobalState::IsAborting() || IsCancelling()) {
-                            HideSimplifiedSentenceTrigger = true;
-                            HideASLSentenceTrigger = true;
+                            HideSimplifiedSentenceTrigger.AtomicSet(true);
+                            HideASLSentenceTrigger.AtomicSet(true);
                             return;
                         }
                         FPlatformProcess::Sleep(FInternalSettings::GetAnimationSpinlockSeconds());
@@ -716,7 +713,7 @@ void ASLMetaHumanDemo::AnimateSentence(const FString & Sentence,
 // Returns false if there was an animation sequence referencing issue or if the animation had to be aborted; true
 // otherwise.
 //
-bool ASLMetaHumanDemo::AnimateToken(const FString & Token, const bool FinalToken) const {
+bool ASLMetaHumanDemo::AnimateToken(const FString & Token, const bool FinalToken) {
     // Note: this will indirectly affect AsynchronousSQSWorker - triggering it to pause!
     //
     SetReadyToAnimateNextToken(false);
@@ -726,7 +723,7 @@ bool ASLMetaHumanDemo::AnimateToken(const FString & Token, const bool FinalToken
                 auto DelaySeconds = FUserSettings::GetWordTransitionDelay();
                 for (float i = 0.0f; i < DelaySeconds; i += FInternalSettings::GetAnimationSpinlockSeconds()) {
                     if (FGlobalState::IsAborting() || IsCancelling()) {
-                        HideTokenTextTrigger = true;
+                        HideTokenTextTrigger.AtomicSet(true);
                         return false;
                     }
                     FPlatformProcess::Sleep(FInternalSettings::GetAnimationSpinlockSeconds());
@@ -739,7 +736,7 @@ bool ASLMetaHumanDemo::AnimateToken(const FString & Token, const bool FinalToken
                     DelaySeconds = GetAnimationDuration(Token);
                     for (float i = 0.0f; i < DelaySeconds; i += FInternalSettings::GetAnimationSpinlockSeconds()) {
                         if (FGlobalState::IsAborting() || IsCancelling()) {
-                            HideTokenTextTrigger = true;
+                            HideTokenTextTrigger.AtomicSet(true);
                             return false;
                         }
                         FPlatformProcess::Sleep(FInternalSettings::GetAnimationSpinlockSeconds());
@@ -748,16 +745,16 @@ bool ASLMetaHumanDemo::AnimateToken(const FString & Token, const bool FinalToken
                     // Whole word(s) translation was not found
                     //
                     if (! AnimateIndividualLettersForToken(Token)) {
-                        HideTokenTextTrigger = true;
+                        HideTokenTextTrigger.AtomicSet(true);
                         return false;
                     }
                 }
-                HideTokenTextTrigger = true;
+                HideTokenTextTrigger.AtomicSet(true);
                 if (FinalToken) {
                     ResetToBeginState();
                 }
                 // Warning: consider this as a 'timing workaround' to allow time for the token hiding thread to hide its
-                // token/avoid collision. FScopedLock and conditional variables for synchronization are likely a
+                // token/avoid collision. FScopeLock and conditional variables for synchronization are likely a
                 // better/more direct approach. Note: need to fairly provide GUI thread time slice for animation playing
                 // v.s. general HUD message displaying Word transition delay will also impact performance - if too low,
                 // there is a risk of hangs (or uncleared text).
@@ -774,7 +771,7 @@ bool ASLMetaHumanDemo::AnimateToken(const FString & Token, const bool FinalToken
 // Lower-level routine to animate individual ASL letter-by-letter signs/tokens derived from an input token (Token).
 // Each individual token is passed (one at a time) to a lower-level routine for animation playing.
 //
-bool ASLMetaHumanDemo::AnimateIndividualLettersForToken(const FString & Token) const {
+bool ASLMetaHumanDemo::AnimateIndividualLettersForToken(const FString & Token) {
     const unsigned int TokenLength = Token.Len();
     for (unsigned int i = 0; i < TokenLength; i++) {
         if (FGlobalState::IsAborting() || IsCancelling()) {
@@ -799,10 +796,10 @@ bool ASLMetaHumanDemo::AnimateIndividualLettersForToken(const FString & Token) c
                 }
                 FPlatformProcess::Sleep(FInternalSettings::GetAnimationSpinlockSeconds());
             }
-            HideTokenComponentTextTrigger = true;
+            HideTokenComponentTextTrigger.AtomicSet(true);
         }
     }
-    HideTokenTextTrigger = true;
+    HideTokenTextTrigger.AtomicSet(true);
     return true;
 }
 
@@ -811,7 +808,7 @@ bool ASLMetaHumanDemo::AnimateIndividualLettersForToken(const FString & Token) c
 // specified play speed (Rate) and start position (StartPosition). Note: the UE API for playing animations will return
 // asynchronously. Returns false if the requested animation couldn't be found; true otherwise.
 //
-bool ASLMetaHumanDemo::AnimateSequence(const FString & Token, const float Rate, const float StartPosition) const {
+bool ASLMetaHumanDemo::AnimateSequence(const FString & Token, const float Rate, const float StartPosition) {
     const auto AnimSequencePtr = AnimationSequenceByTokenMap->Find(Token);
     if (nullptr == AnimSequencePtr) {
         return false;
@@ -849,7 +846,7 @@ bool ASLMetaHumanDemo::AnimateSequence(const FString & Token, const float Rate, 
 // Returns the animation duration corresponding to the specific ASL sign/token provided. A value of 0.0f is returned
 // if the animation duration wasn't found.
 //
-float ASLMetaHumanDemo::GetAnimationDuration(const FString & Token) const {
+float ASLMetaHumanDemo::GetAnimationDuration(const FString & Token) {
     if (nullptr == AnimationSequenceLengthByTokenMap) {
         return 0.0f;
     }

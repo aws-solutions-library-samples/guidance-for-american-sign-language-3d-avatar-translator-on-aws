@@ -4,7 +4,7 @@ import time
 
 from text2Image_helper import write_file_to_s3, check_image_moderation
 
-sns = boto3.client('sns')
+sns_obj = boto3.client('sns')
 aws_region = boto3.Session().region_name
 bedrock_client = boto3.client(
         service_name='bedrock-runtime', 
@@ -55,7 +55,7 @@ def lambda_handler(event, context):
         delay_between_invoking = float(10.0)
         next_epoch = str(math.ceil(time.time()/delay_between_invoking)*int(delay_between_invoking))
         
-        sns_response = sns.publish(
+        sns_response = sns_obj.publish(
             TopicArn=os.environ['snsTopicArn'],
             Message=json.dumps(message),
             MessageStructure='string',

@@ -185,7 +185,7 @@ bool UnrealAPI::GetActorByPath(const FString & ObjectPathToActor,
 //
 template <class TypeOfWidget>
 void UnrealAPI::HideWidget(const TSharedRef<TypeOfWidget> & Widget) {
-    FFunctionGraphTask::CreateAndDispatchWhenReady(
+    const auto& Task = FFunctionGraphTask::CreateAndDispatchWhenReady(
             [Widget]() {
                 TWeakObjectPtr<UWorld> WorldPtrInternal;
                 if (! GetWorld(WorldPtrInternal)) {
@@ -201,4 +201,5 @@ void UnrealAPI::HideWidget(const TSharedRef<TypeOfWidget> & Widget) {
                         WorldPtrInternal->GetFirstLocalPlayerFromController(), Widget);
             },
             TStatId(), nullptr, ENamedThreads::GameThread);
+    Task->Wait();
 }

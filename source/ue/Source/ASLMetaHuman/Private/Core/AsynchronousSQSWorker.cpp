@@ -53,6 +53,7 @@ constexpr auto & InfoMessageReceivedFormatted = TEXT("Message received from SQS 
 constexpr auto & InfoNoMessageReceived = TEXT("No messages received from queue");
 constexpr auto & InfoQueuePurged = TEXT("Queue purged");
 constexpr auto & InfoQueueUrlFormatted = TEXT("Queue Url: %s");
+const FString & ChangeBackgroundMessage {"CHANGE_BACKGROUND"};
 }
 
 // Note: maintains an ActionHandler callback for received actions
@@ -142,6 +143,7 @@ bool FAsynchronousSqsWorker::GetQueueUrl(const Aws::String & QueueName, Aws::Str
     return Outcome.IsSuccess();
 }
 
+
 // Attempts to request the next (FIFO-based) queued message if one is available
 // Only one message is processed at a time; future messages are delayed until the current message is processed.
 // If there's an error before message processing, then the next message won't be delayed
@@ -169,11 +171,27 @@ bool FAsynchronousSqsWorker::RequestNextQueuedMessage(const Aws::String & QueueU
             const Aws::SQS::Model::Message & NewMessage = Messages[0];
             const auto & MessageBody = UnrealAPI::AwsStringToFString(NewMessage.GetBody());
             UE_LOG(LogTemp, Log, InfoMessageReceivedFormatted, *MessageBody);
-            // Message doesn't need to remain in the queue - we have it
-            // Consider adding additional handling in case a message fails to remove from its queue
+            // Consider adding more specific message handling outside
             //
-            bool Status = DeleteQueuedMessage(QueueUrl, NewMessage.GetReceiptHandle());
-            ProcessMessage(MessageBody);
+            if (MessageBody.Contains(ChangeBackgroundMessage)) {
+                if (IsReadyForNewBackgroundMessage()) {
+                    // Don't take the background image of another sentence until the current sentence finishes rendition
+                    //
+                    SetIsReadyForNewBackgroundMessage(false);
+                    if (! DeleteQueuedMessage(QueueUrl, NewMessage.GetReceiptHandle())) {
+                        // The current expected background is still queued (it's the next item)
+                        //
+                        SetIsReadyForNewBackgroundMessage(true);
+                        return false;
+                    }
+                    ProcessMessage(MessageBody);
+                }
+            } else {
+                // Consider adding additional handling in case a message fails to remove from its queue
+                //
+                DeleteQueuedMessage(QueueUrl, NewMessage.GetReceiptHandle());
+                ProcessMessage(MessageBody);
+            }
         } else {
             UE_LOG(LogTemp, Log, InfoNoMessageReceived);
             if (! WantOnDemandMessage) {
