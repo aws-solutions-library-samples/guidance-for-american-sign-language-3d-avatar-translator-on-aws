@@ -25,7 +25,7 @@ Resources:
             Priority: 1
       AdminCreateUserConfig:
         AllowAdminCreateUserOnly: True
-      MfaConfiguration: "OFF"
+      MfaConfiguration: "OPTIONAL"
       UserPoolName: augmentability-user-pool
 
   # Create an Amazon Cognito User 
@@ -107,7 +107,7 @@ Resources:
                   - "rekognition:DetectText"
                   - "rekognition:DetectLabels"
                   - "textract:DetectDocumentText"
-                Resource: "*"
+                Resource: "arn:aws:iam::*:user/${aws:username}/*"
                 Condition:
                   StringEquals: 
                     "aws:RequestedRegion": !Ref Region
