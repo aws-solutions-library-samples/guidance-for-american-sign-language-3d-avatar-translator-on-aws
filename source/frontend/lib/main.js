@@ -57,6 +57,13 @@ aws_amplify.Amplify.Auth.currentAuthenticatedUser()
             window.location.pathname = "/";
     });
 
+function escapeHtml(unsafeText) {
+    const div = document.createElement('div');
+    const text = document.createTextNode(unsafeText);
+    div.appendChild(text);
+    return div.innerHTML;
+}
+
 function callApiOnClick(avatar) {
     aws_amplify.Amplify.Auth.currentAuthenticatedUser()
         .then((user) => {
@@ -996,7 +1003,7 @@ function toggleStartStopConversation(disableStart = false) {
 }
 
 function showError(message) {
-    $("#error").html('<i class="fa fa-times-circle"></i> ' + message);
+    $("#error").text(escapeHtml('<i class="fa fa-times-circle"></i> ' + message));
     $("#error").show();
 }
 
@@ -1112,7 +1119,7 @@ $("#take-photo").click(function () {
 
 function displayError(err = "") {
     if (err != "") {
-        $("#errorMsg").html(err);
+        $("#errorMsg").text(err);
     }
     $("#errorMsg").removeClass("d-none");
 }
@@ -1122,7 +1129,7 @@ function cameraStarted() {
     webcam.start();
     $("#errorMsg").addClass("d-none");
     $(".flash").hide();
-    $("#webcam-caption").html("on");
+    $("#webcam-caption").text("on");
     $("#webcam-control").removeClass("webcam-off");
     $("#webcam-control").addClass("webcam-on");
     $(".webcam-container").removeClass("d-none");
