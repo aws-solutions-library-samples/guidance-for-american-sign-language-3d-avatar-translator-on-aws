@@ -70,7 +70,6 @@ def generate_image(image_input_details):
             'headers': {
                 'Content-Type': 'application/json; charset=UTF-8'
             },
-            "body": "success",
             'body': json.dumps(dictionary)
         }
 

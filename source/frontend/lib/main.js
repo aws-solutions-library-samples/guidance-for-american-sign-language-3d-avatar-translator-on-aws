@@ -170,25 +170,10 @@ $("#sign-in").click(function () {
         }, 2000);
     } catch (error) {
         console.log(error);
-        alert("Error signing in.");
+        
     }
 });
 
-/**
- * Amazon Cognito credentials provider initilization in case no Cognito User Pool is used
- */
-
-/*
-AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-    IdentityPoolId: appConfig.IdentityPoolId,
-});
-
-// As of v2.1.20 the credentials are fetched lazily when a request is made. To explicitly get credentials you can use AWS.Credentials.get()
-AWS.config.credentials.get(function (err) {
-    if (err) console.log(err);
-    //  else console.log(AWS.config.credentials);
-});
-*/
 
 /**
  * Variables initilization
@@ -700,7 +685,7 @@ function speakText() {
     setLanguage();
 
     if (typeof pollyVoiceMap.get(languageCode) === "undefined") {
-        document.getElementById("result").innerHTML =
+        document.getElementById("result").textContent =
             "The language you selected is not available for text-to-speech";
         return;
     }
@@ -728,14 +713,14 @@ function speakText() {
     // Create presigned URL of synthesized speech file
     signer.getSynthesizeSpeechUrl(speechParams, function (error, url) {
         if (error) {
-            document.getElementById("result").innerHTML =
+            document.getElementById("result").textContent =
                 "Oops! Something went wrong.";
         } else {
             document.getElementById("audioSource").src = url;
             if (document.getElementById("audioPlayback").style.display === "none")
                 document.getElementById("audioPlayback").style.display = "block";
             document.getElementById("audioPlayback").load();
-            //document.getElementById("result").innerHTML = "Ready!";
+            //document.getElementById("result").textContent = "Ready!";
         }
     });
 }
@@ -745,7 +730,7 @@ function translateSpeakText() {
     setLanguage();
 
     if (typeof pollyVoiceMap.get(languageCode) === "undefined") {
-        document.getElementById("result").innerHTML =
+        document.getElementById("result").textContent =
             "The language you selected is not available for text-to-speech";
         return;
     }
@@ -781,14 +766,14 @@ function translateSpeakText() {
             // Create presigned URL of synthesized speech file
             signer.getSynthesizeSpeechUrl(speechParams, function (error, url) {
                 if (error) {
-                    document.getElementById("result").innerHTML =
+                    document.getElementById("result").textContent =
                         "Oops! Something went wrong.";
                 } else {
                     document.getElementById("audioSource").src = url;
                     if (document.getElementById("audioPlayback").style.display === "none")
                         document.getElementById("audioPlayback").style.display = "block";
                     document.getElementById("audioPlayback").load();
-                    //document.getElementById("result").innerHTML = "Ready!";
+                    //document.getElementById("result").textContent = "Ready!";
                 }
             });
         }
@@ -804,7 +789,7 @@ function conversationSpeak() {
         typeof pollyVoiceMap.get($("#translateTo").find(":selected").val()) ===
         "undefined"
     ) {
-        document.getElementById("result").innerHTML =
+        document.getElementById("result").textContent =
             "The language you selected is not available for text-to-speech";
         return;
     }
@@ -830,7 +815,7 @@ function conversationSpeak() {
     // Create presigned URL of synthesized speech file
     signer.getSynthesizeSpeechUrl(speechParams, function (error, url) {
         if (error) {
-            document.getElementById("result").innerHTML =
+            document.getElementById("result").textContent =
                 "Oops! Something went wrong.";
         } else {
             document.getElementById("audioSource").src = url;
@@ -1208,7 +1193,7 @@ function ProcessImage(picture) {
                             document.getElementById("translate-dyslexic-div").style.display =
                                 "none";
                             document.getElementById("detectedText").style.display = "none";
-                            document.getElementById("detectedTextAlert").innerHTML =
+                            document.getElementById("detectedTextAlert").textContent =
                                 "No text detected. Please try again!";
                             speakDetectedTextFromWebcam(
                                 "No text detected. Please try again!",
@@ -1279,7 +1264,7 @@ function ProcessImage(picture) {
                             document.getElementById("translate-dyslexic-div").style.display =
                                 "none";
                             document.getElementById("detectedText").style.display = "none";
-                            document.getElementById("detectedTextAlert").innerHTML =
+                            document.getElementById("detectedTextAlert").textContent =
                                 "No text detected. Please try again!";
                             speakDetectedTextFromWebcam(
                                 "No text detected. Please try again!",
@@ -1355,8 +1340,8 @@ function ProcessImage(picture) {
                                     else {
                                         string = data["TranslatedText"];
                                         sanitizedString.textContent = string;
-                                        document.getElementById("detectedText").innerHTML =
-                                            sanitizedString.innerHTML;
+                                        document.getElementById("detectedText").textContent =
+                                            sanitizedString;
                                         if (languageFromURL == "ar" || languageFromURL == "arb") {
                                             $("#detectedText").css("direction", "rtl");
                                         } else {
@@ -1367,15 +1352,15 @@ function ProcessImage(picture) {
                                 });
                             } else {
                                 sanitizedString.textContent = string;
-                                document.getElementById("detectedText").innerHTML =
-                                    sanitizedString.innerHTML;
+                                document.getElementById("detectedText").textContent =
+                                    sanitizedString;
                                 $("#detectedText").css("direction", "ltr");
                                 speakDetectedTextFromWebcam(string, languageFromURL);
                             }
                         } else {
                             console.log("No objects detected. Please try again!");
                             document.getElementById("show-text").style.display = "block";
-                            document.getElementById("detectedText").innerHTML =
+                            document.getElementById("detectedText").textContent =
                                 "No objects detected. Please try again!";
                             speakDetectedTextFromWebcam(
                                 "No objects detected. Please try again!",
