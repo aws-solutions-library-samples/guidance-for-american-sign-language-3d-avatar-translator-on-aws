@@ -15,7 +15,7 @@
 9. [License](#License)
 10. [Next Steps](#next-steps)
 11. [Cleanup](#cleanup)
-12. [FAQ, known issues, additional considerations, and limitations] (#faq-known-issues-additional-considerations-and-limitations-optional)
+12. [FAQ, known issues, additional considerations, and limitations](#faq-known-issues-additional-considerations-and-limitations-optional)
 13. [Notices](#notices)
 14. [Authors](#authors)
 
