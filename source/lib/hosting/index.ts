@@ -17,8 +17,6 @@ export interface CloudFrontDistributionForS3Props {
     hostingBucket: Bucket;
     loggingBucket: Bucket;
     env: string;
-    // altDomainCname: string;
-    // cert: Certificate;
 }
 
 export function CloudFrontDistributionForS3(
@@ -35,8 +33,6 @@ export function CloudFrontDistributionForS3(
     });
 
     const distribution = new Distribution(scope, 'Distribution', {
-        //domainNames: [props.altDomainCname],
-        //certificate: props.cert,
         defaultRootObject: 'index.html',
         httpVersion: HttpVersion.HTTP2_AND_3,
         defaultBehavior: {
@@ -68,19 +64,8 @@ export function CloudFrontDistributionForS3(
     const cfnDistribution = distribution.node.defaultChild as CfnDistribution;
 
     cfnDistribution.addPropertyOverride('DistributionConfig.Origins.0.S3OriginConfig.OriginAccessIdentity', '');
-    //cfnDistribution.addPropertyOverride('DistributionConfig.0.OriginAccessControlId', oac.getAtt('Id'));
 
     cfnDistribution.addPropertyOverride('DistributionConfig.Origins.0.OriginAccessControlId', oac.getAtt('Id'))
-
-
-    //const comS3PolicyOverride = props.hostingBucket.node.findChild('Policy').node.defaultChild as CfnBucketPolicy;
-    //comS3PolicyOverride.addDependency(oac);
-
-    //const statement = comS3PolicyOverride.policyDocument.statements[2];
-
-    // if (statement._principal && statement._principal.CanonicalUser) {
-    //     delete statement._principal.CanonicalUser;
-    // }
 
     props.hostingBucket.addToResourcePolicy(
         new iam.PolicyStatement({
@@ -102,25 +87,6 @@ export function CloudFrontDistributionForS3(
         })
     );
     
-
-    // comS3PolicyOverride.addPropertyOverride('PolicyDocument.Statement.2.Principal', {
-    //     Service: 'amazonaws.com',
-    // });
-
-    // comS3PolicyOverride.addPropertyOverride('PolicyDocument.Statement.2.Condition', {
-    //     StringEquals: {
-    //         'AWS:SourceArn': Stack.of(scope).formatArn({
-    //             service: 'cloudfront',
-    //             region: '',
-    //             resource: 'distribution',
-    //             resourceName: distribution.distributionId,
-    //             arnFormat: ArnFormat.SLASH_RESOURCE_NAME,
-    //         }),
-    //     },
-    // });
-    //cfnDistribution.addPropertyOverride('DistributionConfig.0.S3OriginConfig.OriginAccessIdentity', '');
-    //cfnDistribution.addDeletionOverride('DistributionConfig.0.S3OriginConfig.OriginAccessIdentity');
-
     return distribution;
 }
 
@@ -187,17 +153,11 @@ export class AslMetahumanHosting extends Construct {
             serverAccessLogsPrefix: `s3-access-logs/${props.env}/`
         });
 
-        // const altDomainCname =  'demos.aws.dev';
-        // const certificate = new Certificate(this, 'CloudFrontCertificate', {
-        //     domainName: altDomainCname,
-        // });
 
         this.distribution = CloudFrontDistributionForS3(this, {
             hostingBucket: this.hostingBucket,
             loggingBucket: this.loggingBucket,
             env: props.env,
-            // altDomainCname: altDomainCname,
-            // cert: certificate,
         });
 
         new cdk.CfnOutput(this, "domain name ", {
