@@ -11,7 +11,6 @@ const v4 = require("./aws-signature-v4"); // to generate our pre-signed URL
 const marshaller = require("@aws-sdk/eventstream-marshaller"); // for converting binary event stream messages to and from JSON
 const util_utf8_node = require("@aws-sdk/util-utf8-node"); // utilities for encoding and decoding UTF8
 const mic = require("microphone-stream"); // collect microphone input as a stream of raw bytes
-//const transcriptBucket = "asltranscriptassetdd4b54f0-6577-11ef-aa96-0ef804526771"
 
 
 AWS.config.region = amplifyConfig.Auth.region;
@@ -24,7 +23,6 @@ aws_amplify.Amplify.Auth.currentAuthenticatedUser()
         console.log('userPoolId',  appConfig.userPoolId);
         aws_amplify.Amplify.Auth.currentSession()
             .then((data) => {
-                //console.log(data);
                 AWS.config.credentials = new AWS.CognitoIdentityCredentials({
                     IdentityPoolId: appConfig.IdentityPoolId,
                     Logins: {
@@ -36,7 +34,6 @@ aws_amplify.Amplify.Auth.currentAuthenticatedUser()
                 });
                 AWS.config.credentials.get(function (err) {
                     if (err) console.log(err);
-                    //  else console.log(AWS.config.credentials);
                 });
                 if (
                     window.location.pathname == "/" ||
@@ -171,7 +168,6 @@ $("#sign-in").click(function () {
     var pass = document.getElementById("pwd").value;
     try {
         const user = aws_amplify.Amplify.Auth.signIn(username, pass);
-        //console.log(user);
         const myTimeout = setTimeout(function () {
             location.reload();
         }, 2000);
@@ -361,7 +357,6 @@ $("#start-conversation-button").click(function () {
 
 $("#stop-button").click(function () {
     closeSocket();
-    //sendTranscriptionToStorage();
     callTranscriptAPI();
     toggleStartStop();
     document.getElementById("listening-animation").style.display = "none";
@@ -369,7 +364,7 @@ $("#stop-button").click(function () {
 
 $("#reset-button").click(function () {
     // In case user is recording, abort and clear
-    //
+    
     closeSocket();
     document.getElementById("start-button").style.display = "block";
     document.getElementById("stop-button").style.display = "none";
@@ -619,50 +614,6 @@ function disableLanguage() {
     });
 }
 
-// function sendTranscriptionToStorage() {
-//     var iterations = $("#simplification_iterations").val();
-//     var transcription = $("#transcript").val();
-//     if (iterations !== "" && transcription !== "") {
-//         uploadTranscription(iterations, transcription);
-//     }
-// }
-
-// function uploadTranscription(iterationValue, transcriptionValue) {
-//     try {
-//         var s3 = new AWS.S3();
-//         var putParams = {
-//             Bucket: "asl-trasnlator-webapp",
-//             Key: "iterations.txt",
-//             Body: iterationValue,
-//             ContentType: "text/plain",
-//             ContentDisposition: "inline",
-//         };
-//         s3.upload(putParams, function (err, data) {
-//             if (err) {
-//                 console.log(err, err.stack);
-//             } else {
-//                 console.log("1st successfully uploaded the file");
-//             }
-//         });
-//         putParams = {
-//             Bucket: "asl-trasnlator-webapp",
-//             Key: "transcribe.txt",
-//             Body: transcriptionValue,
-//             ContentType: "text/plain",
-//             ContentDisposition: "inline",
-//         };
-//         s3.upload(putParams, function (err, data) {
-//             if (err) {
-//                 console.log(err, err.stack);
-//             } else {
-//                 console.log("2nd successfully uploaded the file");
-//             }
-//         });
-//     } catch (err) {
-//         console.log(err);
-//     }
-// }
-
 function formatTranslate() {
     var currentLanguage = $("#translateTo").find(":selected").val();
     if (currentLanguage == "he" || currentLanguage == "ar") {
@@ -727,7 +678,6 @@ function speakText() {
             if (document.getElementById("audioPlayback").style.display === "none")
                 document.getElementById("audioPlayback").style.display = "block";
             document.getElementById("audioPlayback").load();
-            //document.getElementById("result").textContent = "Ready!";
         }
     });
 }
@@ -780,7 +730,6 @@ function translateSpeakText() {
                     if (document.getElementById("audioPlayback").style.display === "none")
                         document.getElementById("audioPlayback").style.display = "block";
                     document.getElementById("audioPlayback").load();
-                    //document.getElementById("result").textContent = "Ready!";
                 }
             });
         }
@@ -875,16 +824,12 @@ let handleEventStreamMessage = function (messageJson) {
     let results = messageJson.Transcript.Results;
     if (results.length > 0) {
         if (results[0].Alternatives.length > 0) {
-            //location.href = "#";
-            //location.href = "#transcription-div";
             let languageCodeFromStream = "";
-            //console.log(results[0]);
             if (
                 typeof results[0].LanguageCode != "undefined" &&
                 languageCodeFromStream != results[0].LanguageCode
             ) {
                 languageCodeFromStream = results[0].LanguageCode;
-                //console.log(languageCodeFromStream);
                 let languageSelectionElement = document.getElementById("language");
                 languageSelectionElement.value = languageCodeFromStream;
                 document.getElementById("textToSynth").style.display = "block";
@@ -903,15 +848,6 @@ let handleEventStreamMessage = function (messageJson) {
             if (!results[0].IsPartial) {
                 $("#transcript").scrollTop($("#transcript")[0].scrollHeight);
                 transcription += transcript + "\n";
-
-                // if (typeof document.getElementById("translateTo") != "undefined" && document.getElementById("translateTo") != null)
-                //     translateInput(transcript, function (translated) {
-                //         //location.href = "#";
-                //         //location.href = "#translate-div";
-                //         translation += translated + "\n";
-                //         $("#translate").val(translation + "\n");
-                //         $('#translate').scrollTop($('#translate')[0].scrollHeight);
-                //     });
             }
         }
     }
@@ -1170,7 +1106,6 @@ function ProcessImage(picture) {
                             if (data.TextDetections[i].Type == "LINE") {
                                 string += data.TextDetections[i].DetectedText + ", ";
                                 stringHTML += data.TextDetections[i].DetectedText + "\r\n";
-                                //stringHTML += data.TextDetections[i].DetectedText + " ";
                             }
                         }
 
@@ -1241,7 +1176,6 @@ function ProcessImage(picture) {
                             if (data.Blocks[i].BlockType == "LINE") {
                                 string += data.Blocks[i].Text + ", ";
                                 stringHTML += data.Blocks[i].Text + "\r\n";
-                                //stringHTML += data.Blocks[i].Text + " ";
                             }
                         }
 
