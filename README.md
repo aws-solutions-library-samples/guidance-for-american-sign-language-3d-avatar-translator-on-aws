@@ -186,11 +186,12 @@ List](https://aws.amazon.com/about-aws/global-infrastructure/regional-product-se
 
 American Sign Language (ASL) 3D Avatar Translator on AWS is supported in the following AWS Regions (as of Feb 2025):
 
-
 | **Region Name**  | | 
 |-----------|------------|
-|US East (Ohio) | Asia Pacific ( Seoul ) |
-|US East (N. Virginia) | Europe (Paris) |
+|US East (Ohio) | us-east-2 |
+|Asia Pacific ( Seoul ) | ap-northeast-2 |
+|US East (N. Virginia) | us-east-1|
+|Europe (Paris) | eu-west-3 |
 
 
 ## Deployment Steps 
