@@ -4,7 +4,7 @@
 
 1. [Overview](#overview)
     - [Architecture](#architecture)
-    - [Services in this guidance](#services-in-this-guidance)
+    - [Services in this guidance](#aws-services-in-this-guidance)
     - [Cost](#cost)
 3. [High-level Workflow](#high-level-workflow)
 4. [Reference Architecture](#reference-architecture)
@@ -52,11 +52,11 @@ engaging multimodal interface to view ASL translations.
 
 ## High-level Workflow
 
-1) an end user speaks (or types) a phrase in a spoken language of choice
-2) that spoken phrase is transcribed directly
-3) the transcribed phrase is translated via GenAI into English, which is then simplified across multiple iterations 
+1) An end user speaks (or types) a phrase in a spoken language of choice
+2) That spoken phrase is transcribed directly
+3) The transcribed phrase is translated via Generative AI into English, which is then simplified across multiple iterations 
    using carefully-crafted Bedrock prompts
-4) an Avatar in Unreal Engine animates ASL gestures ("signs") corresponding to the simplified transcription
+4) an Avatar in [Unreal Engine](https://www.unrealengine.com/en-US) software animates ASL gestures ("signs") corresponding to the simplified transcription
 
 ## Architecture
 
@@ -65,51 +65,34 @@ engaging multimodal interface to view ASL translations.
 ![Reference Architecture](assets/images/american-sign-language-3d-avatar-translator-on-aws.7ad539a2a8f330eb3f8abcdd305401dc6a03c853.png?raw=true "Architecture") 
 
 ### Architecture Diagram Workflow
-1. User authenticates to the provided sample web interface via [Amazon Cognito](https://aws.amazon.com/cognito/)
-2. User speaks a phrase, which will be transcribed using [Amazon Transcribe](https://aws.amazon.com/transcribe/), or optionally types a phrase. 
-   (Transcribed text will be displayed as it is spoken.)
-3. User requests any of the following actions through the web interface (actions are triggered through [Amazon API Gateway](https://aws.amazon.com/api-gateway/):
-    - Perform ASL Translation
-      - Transcribed phrase text is sent to a [AWS Lambda](https://aws.amazon.com/lambda/) function for processing. This text is then simplified and 
-        translated into English using [Amazon Bedrock](https://aws.amazon.com/bedrock/) managed service. During this process, processed text is analyzed 
-        for toxicity using [Amazon Comprehend](https://aws.amazon.com/comprehend/).
-    - Change the Avatar (which is performing ASL translation)
-      - Different avatars can be selected and the selected avatar will then display in the [Unreal Engine](https://www.unrealengine.com/en-US) sample 
-        application
-    - Change the Background Image (representing the meaning of the translated phase):
-      - A background image in Unreal Engine is generated using Amazon Bedrock. Once generated, a moderation check 
-        will be performed on the generated image to detect unsafe content using [Amazon Rekognition](https://aws.amazon.com/rekognition/).
-    - Stop all Active Activities (in Unreal Engine)
-      - This option will suspend all queued activities (listed above) in Unreal Engine
-    - Change Settings
-      - This option can update custom settings (including ASL signing speed) in Unreal Engine
-4. Each message that specifically relates to ASL translation is pushed to an [Amazon Simple Notification Service (SNS)](https://aws.amazon.com/sns/) 
-   topic. Other message types (from other actions) are publish to another (separate) SNS topic.
-5. SNS messages are then transmitted to two first-in-first-out (FIFO)-based [Amazon Simple Queue Service (SQS)](https://aws.amazon.com/sqs/) queues
-6. The Unreal Engine sample application, which includes the MetaHuman plugin, is running on an [Amazon Elastic 
-   Cloud Compute (EC2)](https://aws.amazon.com/ec2) instance or on a client-based machine. That application is subscribed to the SQS queue, 
-   periodically polling it to consume messages (when ready) and processes them. 
-7. User can remotely access the Amazon EC2 instance through Remote Desktop Protocol or [NiceDCV (Amazon DCV)](https://aws.amazon.com/blogs/aws/nice-desktop-cloud-visualization-dcv-is-now-amazon-dcv/) software to visualize the 3D avatar that is performing ASL translation.
-
-**TO DO: update Services list below**
+1. User authenticates to [Amazon Cognito](https://aws.amazon.com/cognito/) using an [Amazon CloudFront](https://aws.amazon.com/cloudfront/)-hosted website or web API (through Amazon Cognito-based JWT access token).
+2. User types or speaks an input phrase in a chosen language, which [Amazon Transcribe](https://aws.amazon.com/transcribe/) transcribes. Transcription is stored in an [Amazon Simple Storage Service](https://aws.amazon.com/s3/) (Amazon S3) bucket.
+3. User requests an action (like ASL translate,Change avatar, or Change background image) through the website or web API ([Amazon API Gateway](https://aws.amazon.com/api-gateway/) endpoint).
+4. Based on the user-requested action, API Gateway routes its request to a corresponding [AWS Lambda](https://aws.amazon.com/lambda/) function for processing of that action.
+5. For ASL Translation requests, a matching AWS Lambda function invokes [Amazon Bedrock](https://aws.amazon.com/bedrock/) API to form an ASL phrase for the provided input phrase and obtain a contextual 2D image (to be stored in an S3 bucket).
+6. [Amazon Comprehend](https://aws.amazon.com/comprehend/) and Amazon Bedrock perform multi-lingual toxicity checks on the input phrase. [Amazon Rekognition](https://aws.amazon.com/rekognition/) performs visual toxicity checks on 2D-generated images. Toxicity check results are returned to respective Lambda functions.
+7. All Lambda functions generate a JSON-based payload to capture a user-requested action for [Epic Games Unreal Engine](https://www.unrealengine.com/en-US/home). Each payload is sent to a corresponding [Amazon Simple Notification Service (Amazon SNS)](https://aws.amazon.com/sns/) topic: `Translation` or `Non-Translation`.
+8. Each Amazon SNS-based payload is transmitted to its corresponding [Amazon Simple Queue Service (Amazon SQS)]() queue for later consumption by Unreal Engine.
+9. Using the [AWS SDK](https://aws.amazon.com/sdk-for-cpp/), the Unreal Engine application polls and dequeues Amazon SQS action-based payloads from its queues. Background images are fetched from an S3 bucket for translation requests.
+10. Based on each payload received, the Unreal Engine application performs a user-requested action and
+displays resulting video output on that user’s system. This output provides an ASL-equivalent interpretation of an input phrase by displaying a [MetaHuman](https://www.unrealengine.com/marketplace/en-US/product/metahuman-plugin) 3D avatar animation with ASL-transformed text displayed.
 
 ### AWS services in this Guidance
 
-| **AWS Service** | **Role** | **Description** |
-|-----------------|----------|-----------------|
-| [Amazon Elastic Kubernetes Service](https://aws.amazon.com/eks/) ( EKS) | Core service | Manages the Kubernetes control plane and worker nodes for container orchestration. |
-| [Amazon Elastic Compute Cloud](https://aws.amazon.com/ec2/) (EC2) | Core service | Provides the compute instances for EKS worker nodes and runs containerized applications. |
-| [Amazon Virtual Private Cloud](https://aws.amazon.com/vpc/) (VPC) | Core Service | Creates an isolated network environment with public and private subnets across multiple Availability Zones. |
-| [Amazon Elastic Container Registry](http://aws.amazon.com/ecr/) (ECR) | Supporting service | Stores and manages Docker container images for EKS deployments. |
-| [Elastic Load Balancing](https://aws.amazon.com/elasticloadbalancing/) (NLB) | Supporting service | Distributes incoming traffic across multiple targets in the EKS cluster. |
-| [Amazon Elastic Block Store](https://aws.amazon.com/ebs) (EBS) | Supporting service | Provides persistent block storage volumes for EC2 instances in the EKS cluster. |
-| [AWS Identity and Access Management](https://aws.amazon.com/iam/) (IAM) | Supporting service | Manages access to AWS services and resources securely, including EKS cluster access. |
-| [Amazon Managed Grafana](https://aws.amazon.com/grafana/) (AMG) | Observability service | Provides fully managed  service for metrics visualization and monitoring. |
-| [Amazon Managed Service for Prometheus](https://aws.amazon.com/prometheus/) (AMP) | Observability service | Offers managed Prometheus-compatible monitoring for container metrics. |
-| [AWS Certificate Manager](https://aws.amazon.com/certificate-manager/) (ACM) | Security service | Manages SSL/TLS certificates for secure communication within the cluster. |
-| [Amazon CloudWatch](https://aws.amazon.com/cloudwatch/) | Monitoring service | Collects and tracks metrics, logs, and events from EKS and other AWS resources provisoned in the guidance |
-| [AWS Systems Manager](https://aws.amazon.com/systems-manager/) | Management service | Provides operational insights and takes action on AWS resources. |
-| [AWS Key Management Service](https://aws.amazon.com/kms/) (KMS) | Security service | Manages encryption keys for securing data in EKS and other AWS services. |
+| **AWS service**                                              | Role       |                                                                   |
+| ------------------------------------------------------------ | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Amazon Transcribe](https://aws.amazon.com/transcribe/) | Core | Convert user speech to text. |
+| [Amazon Bedrock](https://aws.amazon.com/bedrock/)      | Core       | Invoke Foundation model to translate natural language to ASL.|
+| [Amazon API Gateway](https://aws.amazon.com/api-gateway/)    | Core       | Create API to invoke lambda function from user interface.  |
+| [AWS Lambda](https://aws.amazon.com/lambda/)                 | Core       | Run custom code to generate ASL for simplified text.  |
+| [Amazon Cognito](https://aws.amazon.com/pm/cognito/)          | Core       | Authenticate user to access ASL translator |
+| [Amazon Comprehend](https://aws.amazon.com/comprehend/)          | Core       | Run moderation to detect toxicty on generated text |
+| [Amazon Rekognition](https://aws.amazon.com/rekognition/)          | Core       | Run moderation to detect toxicty on generated image |
+| [Amazon Cloudfront](https://aws.amazon.com/cloudfront/)          | Core       | Secure , faster user experience  |
+| [Amazon Simple Storage Service (S3)](https://aws.amazon.com/pm/serv-s3/)          | Core       | Host user interface code  |
+| [Amazon Simple Notification Service (SNS)](https://aws.amazon.com/sns/)          | Core       | Send the notification to Unreal Engine  |
+| [Amazon Simple Queue Service (SQS)](https://aws.amazon.com/sqs/)          | Core       | Unreal Engine consumes the message from queue  |
+
    
 ### Cost
 
@@ -123,33 +106,33 @@ Suggest you keep this boilerplate text:
 _We recommend creating a [Budget](https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html) through [AWS Cost Explorer](https://aws.amazon.com/aws-cost-management/aws-cost-explorer/) to help manage costs. Prices are subject to change. For full details, refer to the pricing webpage for each AWS service used in this Guidance._
 -->
 
-### Sample Cost Table ( required )
+### Sample Cost Table
 
+<!--
 The following table provides a sample cost breakdown for deploying this Guidance with the default parameters in the US East (N. Virginia) Region for one month.
 
 | AWS service  | Dimensions | Cost [USD] |
 | ----------- | ------------ | ------------ |
 | Amazon API Gateway | 1,000,000 REST API calls per month  | $ 3.50month |
 | Amazon Cognito | 1,000 active users per month without advanced security feature | $ 0.00 |
+-->
 
-**TO DO: edit the table below with actual services /costs**
+**TO DO: edit the table below with actual costs**
 
 The following table provides a sample cost breakdown for deploying this guidance with the default parameters in the `us-east-1` (N. Virginia) Region for one month. This estimate is based on the AWS Pricing Calculator output for the full deployment as per the guidance.
 
-| **AWS service** | Dimensions | Cost, month [USD] |
-|-----------------|------------|-------------------|
-| Amazon EKS | 1 cluster | $73.00 |
-| Amazon VPC | 3 NAT Gateways | $98.67 |
-| Amazon EC2 | 2 m6g.large instances | $112.42 |
-| Amazon Managed Service for Prometheus (AMP) | Metric samples, storage, and queries | $100.60 |
-| Amazon Managed Grafana (AMG) | Metrics visualization - Editor and Viewer users | $14.00 |
-| Amazon EBS | gp2 storage volumes and snapshots | $17.97 |
-| Application Load Balancer | 1 ALB for workloads | $16.66 |
-| Amazon VPC | Public IP addresses | $3.65 |
-| AWS Key Management Service (KMS) | Keys and requests | $7.00 |
-| Amazon CloudWatch | Metrics | $3.00 |
-| Amazon ECR | Data storage | $0.50 |
-| **TOTAL** |  | **$447.47/month** |
+| AWS service  | Dimensions | Cost [USD] |
+| ----------- | ------------ | ------------ |
+| Amazon Transcribe | 5,000 requests, 34 KB request size | <$1/month |
+| Amazon Bedrock | 10 users  | <$1/month |
+| Amazon API Gateway | 5,000 requests, 128 MB memory allocation, 25 s duration | <$1/month |
+| AWS Lambda (event trigger) | 5,000 requests, 128 MB memory allocation, 5 s duration | <$1/month |
+| Amazon Cognito | 1 GB storage  | <$2/month |
+| Amazon Comprehend | 10 GB standard storage  | <$1/month |
+| Amazon Rekognition | 200 input / 300 output tokens per request (5,000 requests) | $44/month |
+| Amazon S3 | 200 input / 300 output tokens per request (5,000 requests) | $26/month |
+| Amazon SNS | 730 hours x 1.125 USD/hour | $821/month |
+| Amazon SQS | 730 hours x 1.125 USD/hour | $821/month |
 
 ## Prerequisites (required)
 
@@ -194,9 +177,20 @@ The following table provides a sample cost breakdown for deploying this guidance
 
 <Talk about any critical service limits that affect the regular functioning of the Guidance. If the Guidance requires service limit increase, include the service name, limit name and link to the service quotas page.>
 
-### Supported Regions (if applicable)
+### Supported Regions
 
-<If the Guidance is built for specific AWS Regions, or if the services used in the Guidance do not support all Regions, please specify the Region this Guidance is best suited for>
+
+This Guidance uses the Amazon Bedrock service, which is not currently available in all AWS Regions. You must launch this solution in
+an AWS Region where Amazon Bedrock is available. For the most current availability of AWS services by Region, refer to the [AWS Regional Services
+List](https://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/).
+
+American Sign Language (ASL) 3D Avatar Translator on AWS is supported in the following AWS Regions (as of Feb 2025):
+
+
+| **Region Name**  | | 
+|-----------|------------|
+|US East (Ohio) | Asia Pacific ( Seoul ) |
+|US East (N. Virginia) | Europe (Paris) |
 
 
 ## Deployment Steps 
