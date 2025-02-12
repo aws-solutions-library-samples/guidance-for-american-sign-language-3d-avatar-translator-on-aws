@@ -10,15 +10,17 @@
 4. [Reference Architecture](#reference-architecture)
 5. [Prerequisites](#prerequisites-required)
     - [Operating System](#operating-system-required)
-6. [Deployment Steps](#deployment-steps-required)
+6. [Deployment and Validation Steps](#deployment-and-validation-steps)
+<!--
 7. [Deployment Validation](#deployment-validation-required)
 8. [Running the Guidance](#running-the-guidance-required)
-9. [License](#License)
-10. [Next Steps](#next-steps)
-11. [Cleanup](#cleanup)
-12. [FAQ, known issues, additional considerations, and limitations](#faq-known-issues-additional-considerations-and-limitations-optional)
-13. [Notices](#notices)
-14. [Authors](#authors)
+-->
+7. [License](#License)
+8. [Next Steps](#next-steps)
+9. [Cleanup](#cleanup)
+10. [FAQ, known issues, additional considerations, and limitations](#faq-known-issues-additional-considerations-and-limitations-optional)
+11. [Notices](#notices)
+12. [Authors](#authors)
 
 
 Currently, this repository consists purely of documentation for a Spatial Computing/GenAI prototype solution that was 
@@ -41,7 +43,7 @@ GenAI is applied to re-interpret these multilingual input phrases into simpler, 
 multiple iterations/passes. These resulting phases have a different (more charitable) kind of interpretation versus 
 the resulting phrases produced by traditional non-GenAI-based translation tools. Finally, this prototype animates a 
 realistic avatar in Unreal Engine (via <a href="https://www.unrealengine.com/en-US/metahuman" 
-target="_blank">MetaHuman plugin</a>) to visually depict the ASL translation of those resulting phrases. ASL
+target="_blank"> MetaHuman plugin</a>) to visually depict the ASL translation of those resulting phrases. ASL
 translation in this prototype is based on a very loose/naïve interpretation of ASL rules and grammar, involving 
 primarily hand and arm movements, all of which end users can refine. The main goals of this project are to essentially
 improve the translation of existing robust ASL translation engines (through the use of GenAI), and to provide an 
@@ -146,11 +148,9 @@ The following table provides a sample cost breakdown for deploying this guidance
 
 - Include install commands for packages, if applicable.
 
-
 ### Third-party tools (If applicable)
 
 *List any installable third-party tools required for deployment.*
-
 
 ### AWS account requirements (If applicable)
 
@@ -166,7 +166,6 @@ The following table provides a sample cost breakdown for deploying this guidance
 - IAM role with specific permissions
 - Enabling a Region or service etc.
 
-
 ### aws cdk bootstrap (if sample code has aws-cdk)
 
 <If using aws-cdk, include steps for account bootstrap for new cdk users.>
@@ -178,7 +177,6 @@ The following table provides a sample cost breakdown for deploying this guidance
 <Talk about any critical service limits that affect the regular functioning of the Guidance. If the Guidance requires service limit increase, include the service name, limit name and link to the service quotas page.>
 
 ### Supported Regions
-
 
 This Guidance uses the Amazon Bedrock service, which is not currently available in all AWS Regions. You must launch this solution in
 an AWS Region where Amazon Bedrock is available. For the most current availability of AWS services by Region, refer to the [AWS Regional Services
@@ -194,7 +192,7 @@ American Sign Language (ASL) 3D Avatar Translator on AWS is supported in the fol
 |Europe (Paris) | eu-west-3 |
 
 
-## Deployment Steps 
+## Deployment and Validation Steps 
 <!--
 Deployment steps must be numbered, comprehensive, and usable to customers at any level of AWS expertise. The steps must include the precise commands to run, and describe the action it performs.
 
@@ -216,21 +214,18 @@ Deployment steps must be numbered, comprehensive, and usable to customers at any
 -->
 ### Deployment Instructions
 
-Please refer to [Full Implementation Guide](https://implementationguides.kits.eventoutfitters.aws.dev/asl-3dava-0829/ai-ml/american-sign-language-3d-avatar-translator-on-aws.html) for detailed instructions for all deployment options.
+Please refer to [Full Implementation Guide](https://implementationguides.kits.eventoutfitters.aws.dev/asl-3dava-0829/ai-ml/american-sign-language-3d-avatar-translator-on-aws.html) for detailed instructions for all guidance deployment, running and uninstallation options.
 
-
+<!--
 ## Deployment Validation  (required)
 
 <Provide steps to validate a successful deployment, such as terminal output, verifying that the resource is created, status of the CloudFormation template, etc.>
-
 
 **Examples:**
 
 * Open CloudFormation console and verify the status of the template with the name starting with xxxxxx.
 * If deployment is successful, you should see an active database instance with the name starting with <xxxxx> in        the RDS console.
 *  Run the following CLI command to validate the deployment: ```aws cloudformation describe xxxxxxxxxxxxx```
-
-
 
 ## Running the Guidance (required)
 
@@ -242,8 +237,7 @@ This section should include:
 * Commands to run
 * Expected output (provide screenshot if possible)
 * Output description
-
-
+-->
 
 ## Next Steps
 
@@ -272,14 +266,11 @@ Suggested future enhancements:
 - Include detailed instructions, commands, and console actions to delete the deployed Guidance.
 - If the Guidance requires manual deletion of resources, such as the content of an S3 bucket, please specify.
 
-
 ## FAQ, known issues, additional considerations, and limitations (optional)
-
 
 **Known issues (optional)**
 
 <If there are common known issues, or errors that can occur during the Guidance deployment, describe the issue and resolution steps here>
-
 
 **Additional considerations (if applicable)**
 
@@ -293,7 +284,6 @@ Suggested future enhancements:
 
 
 Provide a link to the *GitHub issues page* for users to provide feedback.
-
 
 **Example:** *“For any feedback, questions, or suggestions, please use the issues tab under this repo.”*
 
@@ -314,6 +304,6 @@ between AWS and its customers.
 
 We would like to acknowledge the contributions of these editors and reviewers.
 
-* David Israel, Sr Spatial Consultant
+* David Israel, Sr Spatial Compute Consultant
 * Daniel Zilberman, Sr Solutions Architect - Tech Solutions
 * Alain Krok, Sr Prototyping Architect
