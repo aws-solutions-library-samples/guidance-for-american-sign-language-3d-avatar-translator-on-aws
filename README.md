@@ -7,9 +7,8 @@
     - [Services in this guidance](#aws-services-in-this-guidance)
     - [Cost](#cost)
 3. [High-level Workflow](#high-level-workflow)
-4. [Reference Architecture](#reference-architecture)
-5. [Prerequisites](#prerequisites-required)
-    - [Operating System](#operating-system-required)
+4. [Architecture](#architecture)
+5. [Prerequisites](#prerequisites)
 6. [Deployment and Validation Steps](#deployment-and-validation-steps)
 <!--
 7. [Deployment Validation](#deployment-validation-required)
@@ -18,9 +17,8 @@
 7. [License](#License)
 8. [Next Steps](#next-steps)
 9. [Cleanup](#cleanup)
-10. [FAQ, known issues, additional considerations, and limitations](#faq-known-issues-additional-considerations-and-limitations-optional)
-11. [Notices](#notices)
-12. [Authors](#authors)
+10. [Notices](#notices)
+11. [Authors](#authors)
 
 
 Currently, this repository consists purely of documentation for a Spatial Computing/GenAI prototype solution that was 
@@ -136,45 +134,29 @@ The following table provides a sample cost breakdown for deploying this guidance
 | Amazon SNS | 730 hours x 1.125 USD/hour | $821/month |
 | Amazon SQS | 730 hours x 1.125 USD/hour | $821/month |
 
-## Prerequisites (required)
+## Prerequisites
 
-### Operating System (required)
+Verify that your environment satisfies the following prerequisites:
 
-- Talk about the base Operating System (OS) and environment that can be used to run or deploy this Guidance, such as *Mac, Linux, or Windows*. Include all installable packages or modules required for the deployment. 
-- By default, assume Amazon Linux 2/Amazon Linux 2023 AMI as the base environment. All packages that are not available by default in AMI must be listed out.  Include the specific version number of the package or module.
+1. An [AWS account](https://aws.amazon.com/premiumsupport/knowledge-center/create-and-activate-aws-account/)
+2. `AdministratorAccess` policy granted to your AWS account (for production, we recommend restricting access as needed)
+3. Both console and programmatic access
+4. [AWS CLI](https://aws.amazon.com/cli/) installed and configured to use with your AWS account
+5. [NodeJS 22+](https://nodejs.org/en/download/) installed
+6. [Typescript 3.8+](https://www.typescriptlang.org/download) installed
+7. [AWS CDK CLI](https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html) installed
+8. [Docker](https://docs.docker.com/get-docker/) installed
+9. [Python 3+](https://www.python.org/downloads/) installed
 
-**Example:**
-“These deployment instructions are optimized to best work on **<Amazon Linux 2 AMI>**.  Deployment in another OS may require additional steps.”
+You must explicitly enable access to models before they can be used with the Amazon Bedrock service. Please follow these steps in the [Amazon Bedrock User Guide](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html) to enable access to the models used in this solution:
+- stability.stable-diffusion-xl
+- anthropic.claude-v2
 
-- Include install commands for packages, if applicable.
+### Service quotas
 
-### Third-party tools (If applicable)
+Your AWS account has default quotas, also known as service limits, described [here](https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html). This guidance can be installed and tested within the default quotas for each of the services used. You can request increases for some quotas. Note that not all quotas can be increased.
 
-*List any installable third-party tools required for deployment.*
-
-### AWS account requirements (If applicable)
-
-*List out pre-requisites required on the AWS account if applicable, this includes enabling AWS regions, requiring ACM certificate.*
-
-**Example:** “This deployment requires you have public ACM certificate available in your AWS account”
-
-**Example resources:**
-- ACM certificate 
-- DNS record
-- S3 bucket
-- VPC
-- IAM role with specific permissions
-- Enabling a Region or service etc.
-
-### aws cdk bootstrap (if sample code has aws-cdk)
-
-<If using aws-cdk, include steps for account bootstrap for new cdk users.>
-
-**Example blurb:** “This Guidance uses aws-cdk. If you are using aws-cdk for first time, please perform the below bootstrapping....”
-
-### Service limits  (if applicable)
-
-<Talk about any critical service limits that affect the regular functioning of the Guidance. If the Guidance requires service limit increase, include the service name, limit name and link to the service quotas page.>
+To operate this guidance at scale, it is important to monitor your usage of AWS services and configure alarm settings to notify you when a quota is close to being exceeded. You can find details on visualizing your service quotas and setting alarms [here](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Quotas-Visualize-Alarms.html).
 
 ### Supported Regions
 
@@ -193,51 +175,67 @@ American Sign Language (ASL) 3D Avatar Translator on AWS is supported in the fol
 
 
 ## Deployment and Validation Steps 
-<!--
-Deployment steps must be numbered, comprehensive, and usable to customers at any level of AWS expertise. The steps must include the precise commands to run, and describe the action it performs.
 
-* All steps must be numbered.
-* If the step requires manual actions from the AWS console, include a screenshot if possible.
-* The steps must start with the following command to clone the repo. ```git clone xxxxxxx```
-* If applicable, provide instructions to create the Python virtual environment, and installing the packages using ```requirement.txt```.
-* If applicable, provide instructions to capture the deployed resource ARN or ID using the CLI command (recommended), or console action.
+### Deployment
 
- 
-**Example:**
+This project is built using [Cloud Development Kit (CDK)](https://aws.amazon.com/cdk/). See [Getting Started With the AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) for additional details and prerequisites.
 
-1. Clone the repo using command ```git clone xxxxxxxxxx```
-2. cd to the repo folder ```cd <repo-name>```
-3. Install packages in requirements using command ```pip install requirement.txt```
-4. Edit content of **file-name** and replace **s3-bucket** with the bucket name in your account.
-5. Run this command to deploy the stack ```cdk deploy``` 
-6. Capture the domain name created by running this CLI command ```aws apigateway ............```
--->
-### Deployment Instructions
+1. Clone this repository.
 
-Please refer to [Full Implementation Guide](https://implementationguides.kits.eventoutfitters.aws.dev/asl-3dava-0829/ai-ml/american-sign-language-3d-avatar-translator-on-aws.html) for detailed instructions for all guidance deployment, running and uninstallation options.
+   ```shell
+   $ git clone https://github.com/aws-solutions-library-samples/guidance-for-american-sign-language-3d-avatar-translator-on-aws.git
+   ```
+2. Enter the code sample directory.
 
-<!--
-## Deployment Validation  (required)
+   ```shell
+   $ cd source
+   ```
+3. Install dependencies.
 
-<Provide steps to validate a successful deployment, such as terminal output, verifying that the resource is created, status of the CloudFormation template, etc.>
+   ```shell
+   $ npm install
+   ```
+4. Boostrap AWS CDK resources on the AWS account.
 
-**Examples:**
+   ```shell
+   $ cdk bootstrap
+   ```
+5. Deploy the sample in your account. To protect you against unintended changes that affect your security posture, the AWS CDK Toolkit prompts you to approve security-related changes before deploying them. You will need to answer yes to get the stack deployed.
 
-* Open CloudFormation console and verify the status of the template with the name starting with xxxxxx.
-* If deployment is successful, you should see an active database instance with the name starting with <xxxxx> in        the RDS console.
-*  Run the following CLI command to validate the deployment: ```aws cloudformation describe xxxxxxxxxxxxx```
+   ```shell
+   $ cdk deploy
+   ```
+6. Update config.js file with following cdk outputs. This is required to set up the UI with the backend services.
 
-## Running the Guidance (required)
+* "IdentityPoolId":"AwsAslCdkStackIdentityPoolId",
+* "userPoolId": "AwsAslCdkStack.UserPoolId",
+* "userPoolWebClientId": "AwsAslCdkStack.ClientId",
+* "apipath": "AwsAslCdkStack.apigwurl"
 
-<Provide instructions to run the Guidance with the sample data or input provided, and interpret the output received.> 
+Build frontend code base. These commands will create build in /frontend/dist folder.
 
-This section should include:
+    ```shell
+    $ cd frontend
+    $ npm install
+    $ npm run-script build
+    ```
 
-* Guidance inputs
-* Commands to run
-* Expected output (provide screenshot if possible)
-* Output description
--->
+Re-run cdk deploy after updating the file to provide the correct configuration
+
+### Validation
+
+1. Create a user in the Cognito user pool. Go to the [Amazon Cognito page](https://console.aws.amazon.com/cognito/home) in the AWS console, then select the created user pool. Under ```users```, select ```Create user``` and fill in the form
+2. Access the webapp (either locally or cloud hosted) and sign in using the user credentials you just created. 
+For hosted ui please follow these steps 
+Click on App Integration -> Select App client name -> Click ```View Hosted UI```
+
+Sign In with the user name and password. If asked, update the password
+
+3. Copy the CloudFront url from the CDK Output of your stack and paste it on the browser.
+AwsAslCdkStack.CfnOutCloudFrontUrl = "https://<cloudfrontdomainname>.cloudfront.net"
+4. Enter the username and password that was created in the cognito pool.
+5. Click on ```Live transcription```
+6. Send text or change avatar from the UI.
 
 ## Next Steps
 
@@ -263,29 +261,15 @@ Suggested future enhancements:
 
 ## Cleanup
 
-- Include detailed instructions, commands, and console actions to delete the deployed Guidance.
-- If the Guidance requires manual deletion of resources, such as the content of an S3 bucket, please specify.
+Do not forget to delete the stack to avoid unexpected charges.
 
-## FAQ, known issues, additional considerations, and limitations (optional)
+```
+    $ cdk destroy AwsAslCdkStack
+```
 
-**Known issues (optional)**
-
-<If there are common known issues, or errors that can occur during the Guidance deployment, describe the issue and resolution steps here>
-
-**Additional considerations (if applicable)**
-
-<Include considerations the customer must know while using the Guidance, such as anti-patterns, or billing considerations.>
-
-**Examples:**
-
-- “This Guidance creates a public AWS bucket required for the use-case.”
-- “This Guidance created an Amazon SageMaker notebook that is billed per hour irrespective of usage.”
-- “This Guidance creates unauthenticated public API endpoints.”
+Then in the AWS Console, delete the Amazon CloudWatch logs, empty and delete the S3 buckets.
 
 
-Provide a link to the *GitHub issues page* for users to provide feedback.
-
-**Example:** *“For any feedback, questions, or suggestions, please use the issues tab under this repo.”*
 
 ## License
 
