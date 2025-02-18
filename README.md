@@ -96,30 +96,11 @@ displays resulting video output on that user’s system. This output provides an
    
 ### Cost
 
-<!--
-This section is for a high-level cost estimate. Think of a likely straightforward scenario with reasonable assumptions based on the problem the Guidance is trying to solve. If applicable, provide an in-depth cost breakdown table in this section.
-
-Start this section with the following boilerplate text:
-_You are responsible for the cost of the AWS services used while running this Guidance. As of <month> <year>, the cost for running this Guidance with the default settings in the <Default AWS Region (Most likely will be US East (N. Virginia)) > is approximately $<n.nn> per month for processing ( <nnnnn> records )._
-Replace this amount with the approximate cost for running your Guidance in the default Region. This estimate should be per month and for processing/serving resonable number of requests/entities.
-Suggest you keep this boilerplate text:
-_We recommend creating a [Budget](https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html) through [AWS Cost Explorer](https://aws.amazon.com/aws-cost-management/aws-cost-explorer/) to help manage costs. Prices are subject to change. For full details, refer to the pricing webpage for each AWS service used in this Guidance._
--->
+You are responsible for the cost of the AWS services used while running this Guidance. 
 
 ### Sample Cost Table
 
-<!--
-The following table provides a sample cost breakdown for deploying this Guidance with the default parameters in the US East (N. Virginia) Region for one month.
-
-| AWS service  | Dimensions | Cost [USD] |
-| ----------- | ------------ | ------------ |
-| Amazon API Gateway | 1,000,000 REST API calls per month  | $ 3.50month |
-| Amazon Cognito | 1,000 active users per month without advanced security feature | $ 0.00 |
--->
-
-**TO DO: edit the table below with actual costs**
-
-The following table provides a sample cost breakdown for deploying this guidance with the default parameters in the `us-east-1` (N. Virginia) Region for one month. This estimate is based on the AWS Pricing Calculator output for the full deployment as per the guidance.
+The following table provides a sample cost breakdown for deploying this guidance with the default parameters in the `us-east-1` (N. Virginia) Region for one month. This estimate is based on the [AWS Pricing Calculator output](https://calculator.aws/#/estimate?id=7957a979c145d350d81966d353295c26bec7d8c8) for the full deployment of this guidance. As of *February, 2025* an average cost of running this guidance in the `us-east-1` is around *$1718/month*:
 
 | AWS service  | Dimensions | Cost [USD] |
 | ----------- | ------------ | ------------ |
@@ -133,6 +114,7 @@ The following table provides a sample cost breakdown for deploying this guidance
 | Amazon S3 | 200 input / 300 output tokens per request (5,000 requests) | $26/month |
 | Amazon SNS | 730 hours x 1.125 USD/hour | $821/month |
 | Amazon SQS | 730 hours x 1.125 USD/hour | $821/month |
+| **TOTAL**      |      | **$1718/month**|
 
 ## Prerequisites
 
@@ -178,8 +160,8 @@ American Sign Language (ASL) 3D Avatar Translator on AWS is supported in the fol
 
 ### Deployment
 
-This project is built using [Cloud Development Kit (CDK)](https://aws.amazon.com/cdk/). See [Getting Started With the AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) for additional details and prerequisites.
-
+This project is built using [Cloud Development Kit (CDK)](https://aws.amazon.com/cdk/). Please see [Getting Started With the AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) for additional details and prerequisites.
+<!--
 1. Clone this repository.
 
    ```shell
@@ -236,11 +218,14 @@ AwsAslCdkStack.CfnOutCloudFrontUrl = "https://<cloudfrontdomainname>.cloudfront.
 4. Enter the username and password that was created in the cognito pool.
 5. Click on ```Live transcription```
 6. Send text or change avatar from the UI.
+-->
 
+For detailed instructions on deployment and validation of this guidance please refer to this [Implementation Guide](https://implementationguides.kits.eventoutfitters.aws.dev/asl-3dava-0829/ai-ml/american-sign-language-3d-avatar-translator-on-aws.html)
+ 
 ## Next Steps
 
 Overall, this prototype illustrates an end-to-end workflow for American Sign Language (ASL) translation through the 
-use of a 3D avatar. Ideally, generated pre-ASL output phrases should be forwarded to a robust ASL processing engine, 
+use of a 3D Avatar. Ideally, generated pre-ASL output phrases should be forwarded to a robust ASL processing engine, 
 which would then generate corresponding avatar animation data to be supplied to Unreal Engine.
 
 Suggested future enhancements:
@@ -261,7 +246,7 @@ Suggested future enhancements:
 
 ## Cleanup
 
-Do not forget to delete the stack to avoid unexpected charges.
+Do not forget to delete the guidance stack to avoid unexpected charges. A sample command to uninstall it is shown below:
 
 ```
     $ cdk destroy AwsAslCdkStack
@@ -269,11 +254,9 @@ Do not forget to delete the stack to avoid unexpected charges.
 
 Then in the AWS Console, delete the Amazon CloudWatch logs, empty and delete the S3 buckets.
 
-
-
 ## License
 
-This library is licensed under the MIT-0 License. See the [LICENSE](LICENSE) file.
+This library is licensed under the MIT-0 License. PLease see the [LICENSE](LICENSE) file.
 
 ## Notices
 Customers are responsible for making their own independent assessment of the information in this document. This 
