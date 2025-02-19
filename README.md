@@ -40,7 +40,7 @@ prototype animates a realistic avatar in Unreal Engine (via <a href="https://www
 target="_blank"> MetaHuman plugin</a>) to visually depict the ASL translation of those resulting phrases. ASL
 translation in this prototype is based on a very loose/naïve interpretation of ASL rules and grammar, primarily
 involving hand and arm movements - all of which end users can refine. The main goals of this project are to essentially
-improve the translation of existing robust ASL translation engines (through the use of GenAI), and to provide an
+improve the translation of existing robust ASL translation engines (via GenAI), and to provide an
 engaging multimodal interface to view ASL translations.
 
 ![Alt text](assets/images/rainbow-example.png?raw=true "Sample Translation")
@@ -102,8 +102,8 @@ engaging multimodal interface to view ASL translations.
 | [Amazon API Gateway](https://aws.amazon.com/api-gateway/)                | Core | Create API to invoke lambda functions from user interface.    |
 | [AWS Lambda](https://aws.amazon.com/lambda/)                             | Core | Run custom code to generate ASL for simplified text.          |
 | [Amazon Cognito](https://aws.amazon.com/pm/cognito/)                     | Core | Authenticate user to access ASL translator                    |
-| [Amazon Comprehend](https://aws.amazon.com/comprehend/)                  | Core | Run moderation to detect toxicty on generated text            |
-| [Amazon Rekognition](https://aws.amazon.com/rekognition/)                | Core | Run moderation to detect toxicty on generated image           |
+| [Amazon Comprehend](https://aws.amazon.com/comprehend/)                  | Core | Run moderation to detect toxicity on generated text            |
+| [Amazon Rekognition](https://aws.amazon.com/rekognition/)                | Core | Run moderation to detect toxicity on generated image           |
 | [Amazon CloudFront](https://aws.amazon.com/cloudfront/)                  | Core | Fast and secure web-hosted user experience                    |
 | [Amazon Simple Storage Service (S3)](https://aws.amazon.com/pm/serv-s3/) | Core | Host user interface code, store generated images              |
 | [Amazon Simple Notification Service (SNS)](https://aws.amazon.com/sns/)  | Core | Send the notification to Unreal Engine                        |
@@ -118,7 +118,7 @@ You are responsible for the cost of the AWS services used while running this Gui
 The following table provides a sample cost breakdown for deploying this Guidance with the default parameters in the
 `us-east-1` (N. Virginia) Region for one month. This estimate is based on
 the [AWS Pricing Calculator output](https://calculator.aws/#/estimate?id=7957a979c145d350d81966d353295c26bec7d8c8) for
-the full deployment of this Guidance. As of *February, 2025* an average cost of running this Guidance in the `us-east-1`
+the full deployment of this Guidance. As of *February 2025*, an average cost of running this Guidance in the `us-east-1`
 is around *$1718/month*:
 
 | AWS service                | Dimensions                                                 | Cost [USD]      |
@@ -140,7 +140,7 @@ is around *$1718/month*:
 Verify that your environment satisfies the following prerequisites:
 
 1. Contains an [AWS account](https://aws.amazon.com/premiumsupport/knowledge-center/create-and-activate-aws-account/)
-2. Has `AdministratorAccess` policy granted to your AWS account (for production, we recommend restricting access as
+2. Has <i>`AdministratorAccess`</i> policy granted to your AWS account (for production, we recommend restricting access as
    needed and following the principle of least privilege)
 3. Provides console and programmatic access
 4. [AWS CLI](https://aws.amazon.com/cli/) installed and configured to use with your AWS account
