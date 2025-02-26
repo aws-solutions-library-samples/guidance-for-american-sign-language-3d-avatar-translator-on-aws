@@ -192,70 +192,9 @@ American Sign Language (ASL) 3D Avatar Translator on AWS is supported in the fol
 This project is built using [Cloud Development Kit (CDK)](https://aws.amazon.com/cdk/). Please
 see [Getting Started With the AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) for additional
 details and prerequisites.
-<!--
-1. Clone this repository.
-
-   ```shell
-   $ git clone https://github.com/aws-solutions-library-samples/guidance-for-american-sign-language-3d-avatar-translator-on-aws.git
-   ```
-2. Enter the code sample directory.
-
-   ```shell
-   $ cd source
-   ```
-3. Install dependencies.
-
-   ```shell
-   $ npm install
-   ```
-4. Boostrap AWS CDK resources on the AWS account.
-
-   ```shell
-   $ cdk bootstrap
-   ```
-5. Deploy the sample in your account. To protect you against unintended changes that affect your security posture,
-the AWS CDK Toolkit prompts you to approve security-related changes before deploying them. You will need to answer
-yes to get the stack deployed.
-
-   ```shell
-   $ cdk deploy
-   ```
-6. Update config.js file with following cdk outputs. This is required to set up the UI with the backend services.
-
-* "IdentityPoolId":"AwsAslCdkStackIdentityPoolId",
-* "userPoolId": "AwsAslCdkStack.UserPoolId",
-* "userPoolWebClientId": "AwsAslCdkStack.ClientId",
-* "apipath": "AwsAslCdkStack.apigwurl"
-
-Build frontend code base. These commands will create build in /frontend/dist folder.
-
-    ```shell
-    $ cd frontend
-    $ npm install
-    $ npm run-script build
-    ```
-
-Re-run cdk deploy after updating the file to provide the correct configuration
-
-### Validation
-
-1. Create a user in the Cognito user pool. Go to the [Amazon Cognito page](https://console.aws.amazon.com/cognito/home)
-in the AWS console, then select the created user pool. Under ```users```, select ```Create user``` and fill in the form
-2. Access the webapp (either locally or cloud hosted) and sign in using the user credentials you just created. 
-For hosted ui please follow these steps 
-Click on App Integration -> Select App client name -> Click ```View Hosted UI```
-
-Sign In with the username and password. If asked, update the password
-
-3. Copy the CloudFront url from the CDK Output of your stack and paste it on the browser.
-AwsAslCdkStack.CfnOutCloudFrontUrl = "https://<cloudfrontdomainname>.cloudfront.net"
-4. Enter the username and password that was created in the cognito pool.
-5. Click on ```Live transcription```
-6. Send text or change avatar from the UI.
--->
 
 For detailed instructions on deployment and validation of this Guidance please refer to
-this [Implementation Guide](https://implementationguides.kits.eventoutfitters.aws.dev/asl-3dava-0829/ai-ml/american-sign-language-3d-avatar-translator-on-aws.html)
+this [Implementation Guide](https://aws-solutions-library-samples.github.io/ai-ml/american-sign-language-3d-avatar-translator-on-aws.html)
 
 ## Next Steps
 
