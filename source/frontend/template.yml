@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: AugmentAbility - Amazon Cognito stack
+Description: Amazon Cognito stack for Guidance for American Sign Language 3D Avatar (SO9473)
 Parameters:
   Region:
     Type: String
